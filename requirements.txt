@@ -1,7 +1,7 @@
 # Core requirements for SeedVR (excluding torch which is installed separately)
 einops==0.7.0
 omegaconf==2.3.0
-opencv-python==4.9.0.80
+opencv-python==4.12.0.88
 diffusers==0.29.1
 rotary-embedding-torch==0.5.3
 transformers==4.38.2
