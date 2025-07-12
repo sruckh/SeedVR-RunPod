@@ -176,12 +176,15 @@ def get_processor():
         except Exception as e:
             logger.error(f"❌ Failed to initialize SeedVRProcessor: {e}")
             # Create a dummy processor with empty models
+            def dummy_process_video(self, *args, **kwargs):
+                raise gr.Error("❌ Model initialization failed. Please check container logs.")
+            
             processor = type('DummyProcessor', (), {
                 'available_models': [],
                 'current_model': None,
                 'model_loaded': False,
                 'load_model': lambda self, x: False,
-                'process_video': lambda self, *args: (None, "❌ Model initialization failed")
+                'process_video': dummy_process_video
             })()
     return processor
 
