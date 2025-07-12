@@ -100,7 +100,7 @@ docker run --gpus all -p 7860:7860 -e GRADIO_SHARE=true seedvr-runpod
 
 ### Output Settings
 - **Width/Height**: Adjust output resolution (512-2048px)
-- **Seed**: Random seed for reproducible results
+- **Seed**: Fixed seed for reproducible results
 - **Processing Time**: Varies based on video length and resolution
 
 ## 🛡️ Enhanced Robustness
