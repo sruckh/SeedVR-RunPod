@@ -14,7 +14,7 @@ safetensors==0.4.3
 numpy==1.24.4
 pillow==10.3.0
 requests==2.32.3
-tqdm==4.66.4
+tqdm==4.67.1
 psutil==6.0.0
 pyyaml==6.0.1
 
