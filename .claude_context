@@ -1,0 +1,29 @@
+# Claude Code Context for SeedVR-RunPod
+
+## Project Overview
+This is the SeedVR-RunPod project - a dockerized video restoration service using ByteDance SeedVR models optimized for RunPod deployment.
+
+## Current Status
+- ✅ Repository: https://github.com/sruckh/SeedVR-RunPod
+- ✅ Docker Hub: gemneye/seedvr-runpod
+- ✅ CI/CD: GitHub Actions automated builds
+- ✅ Dependencies: Clean baseline with protected version management
+- ✅ Documentation: Complete deployment and development guides
+
+## Key Commands
+```bash
+# Development
+git status
+docker build -t seedvr-runpod:test .
+
+# Deployment
+# Use image: gemneye/seedvr-runpod:latest on RunPod
+# Port: 7860, Env: GRADIO_SHARE, HF_TOKEN
+
+# Dependency management
+# See DEPENDENCY_MANAGEMENT.md for version requirements
+# Monthly Dependabot updates with major version protection
+```
+
+## Working Directory
+**Always work from /opt/docker/SeedVR-RunPod for this project**
