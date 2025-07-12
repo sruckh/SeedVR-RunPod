@@ -215,8 +215,7 @@ def create_interface():
                 
                 input_video = gr.Video(
                     label="Upload Video",
-                    sources=["upload"],
-                    include_audio=True
+                    sources=["upload"]
                 )
                 
                 model_choice = gr.Dropdown(
@@ -287,7 +286,7 @@ def create_interface():
             fn=proc.process_video,
             inputs=[input_video, model_choice, output_height, output_width, seed],
             outputs=output_video,
-            show_progress=True
+            show_progress="full"
         )
     
     return app
