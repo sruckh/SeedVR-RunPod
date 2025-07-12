@@ -295,7 +295,6 @@ def main():
         server_port=server_port,
         share=share_gradio,
         show_error=True,
-        enable_queue=True,
         max_threads=4
     )
 
