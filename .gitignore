@@ -119,3 +119,9 @@ temp/
 
 # Backup files
 *.bak
+
+# Development and setup files (contain personal info or not needed in container)
+quick_setup.sh
+setup_repo.sh
+scripts/
+docker-compose.yml
