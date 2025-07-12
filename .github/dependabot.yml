@@ -1,31 +1,56 @@
 version: 2
 updates:
-  # Enable version updates for Python dependencies
+  # Enable version updates for Python dependencies with constraints
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
+      interval: "monthly"  # Less frequent to avoid disruption
+    open-pull-requests-limit: 5  # Reduced to avoid spam
     labels:
       - "dependencies"
       - "python"
+    # Ignore major version updates for critical packages
+    ignore:
+      # Core ML packages - major version bumps could break compatibility
+      - dependency-name: "transformers"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "diffusers"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "gradio"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "numpy"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pillow"
+        update-types: ["version-update:semver-major"]
+      # Keep Python ecosystem stable
+      - dependency-name: "accelerate"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "huggingface-hub"
+        update-types: ["version-update:semver-major"]
+      # Avoid breaking video processing
+      - dependency-name: "opencv-python"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "imageio"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ffmpeg-python"
+        update-types: ["version-update:semver-major"]
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+    open-pull-requests-limit: 3
     labels:
       - "dependencies"
       - "github-actions"
 
-  # Enable version updates for Docker
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "docker"
+  # Disable Docker updates (Python 3.10 is intentional)
+  # - package-ecosystem: "docker"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "monthly"
+  #   open-pull-requests-limit: 2
+  #   labels:
+  #     - "dependencies"
+  #     - "docker"

@@ -22,10 +22,11 @@ A lightweight Docker container for deploying SeedVR video restoration models on 
 - **CUDA**: Compatible with CUDA 12.1+
 
 ### Software
-- Docker
+- Docker with NVIDIA GPU support
 - NVIDIA Docker runtime
-- Python 3.10
-- PyTorch 2.4.0 with CUDA 12.1 support
+- **Python 3.10** (fixed version for compatibility)
+- **PyTorch 2.4.0** with **CUDA 12.1** support (fixed versions)
+- **Specific package versions** as defined in requirements.txt
 
 ## 🐳 Docker Hub
 
@@ -123,6 +124,12 @@ Based on proven patterns from production deployments, this container includes:
 - **Version Validation**: Ensures compatible PyTorch/CUDA versions
 - **Setup Completion**: Marks successful setup to avoid re-running
 - **Storage Monitoring**: Reports available space during downloads
+
+### Version Management
+- **Fixed Dependencies**: Uses tested, compatible package versions
+- **CUDA Compatibility**: PyTorch 2.4.0 + CUDA 12.1 for optimal performance
+- **Dependabot**: Configured for security patches only (no major version bumps)
+- **Environment Stability**: Python 3.10 ensures compatibility with all components
 
 ## 🔧 Manual Setup
 
