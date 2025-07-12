@@ -37,18 +37,26 @@ def check_model_exists(model_save_dir):
     if not os.path.exists(model_save_dir):
         return False
     
-    # Check for key files that indicate a complete download
-    required_files = ['config.json']
     model_files = os.listdir(model_save_dir)
     
-    # Check if we have at least config.json and some model files
-    has_config = any('config.json' in f for f in model_files)
-    has_model_files = any(f.endswith(('.safetensors', '.pth', '.bin')) for f in model_files)
+    if not model_files:
+        logger.info(f"❌ Model directory {model_save_dir} is empty")
+        return False
     
-    if has_config and has_model_files:
-        logger.info(f"✅ Model already exists at {model_save_dir}")
+    # Check if we have any substantial files (not just .gitattributes or README)
+    substantial_files = [f for f in model_files if not f.startswith('.') and f not in ['README.md']]
+    
+    if substantial_files:
+        logger.info(f"✅ Model exists with {len(substantial_files)} files at {model_save_dir}")
+        # Log a few example files for verification
+        for f in substantial_files[:3]:
+            file_path = os.path.join(model_save_dir, f)
+            if os.path.isfile(file_path):
+                size_mb = os.path.getsize(file_path) / (1024 * 1024)
+                logger.info(f"  📄 {f} ({size_mb:.1f}MB)")
         return True
     
+    logger.info(f"❌ Model directory {model_save_dir} contains only metadata files")
     return False
 
 def download_with_retry(repo_id, model_save_dir, cache_dir, max_retries=5):
@@ -62,8 +70,6 @@ def download_with_retry(repo_id, model_save_dir, cache_dir, max_retries=5):
                 cache_dir=cache_dir,
                 local_dir=model_save_dir,
                 repo_id=repo_id,
-                local_dir_use_symlinks=False,
-                resume_download=True,
                 allow_patterns=[
                     "*.json", 
                     "*.safetensors", 
@@ -82,7 +88,13 @@ def download_with_retry(repo_id, model_save_dir, cache_dir, max_retries=5):
                 logger.info(f"✅ Successfully downloaded {repo_id}")
                 return True
             else:
-                raise Exception("Download completed but model files are missing")
+                # Show what files were actually downloaded for debugging
+                try:
+                    downloaded_files = os.listdir(model_save_dir) if os.path.exists(model_save_dir) else []
+                    logger.error(f"❌ Download verification failed. Files in {model_save_dir}: {downloaded_files}")
+                except Exception as debug_e:
+                    logger.error(f"❌ Download verification failed. Could not list directory: {debug_e}")
+                raise Exception("Download completed but model verification failed")
                 
         except Exception as e:
             logger.error(f"❌ Download attempt {attempt + 1} failed: {str(e)}")
