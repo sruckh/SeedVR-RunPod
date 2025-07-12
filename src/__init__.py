@@ -1,0 +1,1 @@
+# SeedVR RunPod Package
