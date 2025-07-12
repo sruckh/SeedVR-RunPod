@@ -1,6 +1,6 @@
 # SeedVR RunPod Container - Lightweight setup for remote installation
 # Supports both SeedVR2-3B and SeedVR2-7B models
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
