@@ -19,7 +19,7 @@ psutil==6.0.0
 pyyaml==6.0.2
 
 # Gradio and web interface
-gradio==4.44.0
+gradio==5.36.2
 matplotlib==3.9.0
 
 # Video processing
