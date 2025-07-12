@@ -163,11 +163,33 @@ class SeedVRProcessor:
             # Cleanup temporary directory
             shutil.rmtree(output_dir, ignore_errors=True)
 
-# Initialize processor
-processor = SeedVRProcessor()
+# Global processor variable
+processor = None
+
+def get_processor():
+    """Get or create the processor instance"""
+    global processor
+    if processor is None:
+        try:
+            processor = SeedVRProcessor()
+            logger.info("✅ SeedVRProcessor initialized successfully")
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize SeedVRProcessor: {e}")
+            # Create a dummy processor with empty models
+            processor = type('DummyProcessor', (), {
+                'available_models': [],
+                'current_model': None,
+                'model_loaded': False,
+                'load_model': lambda self, x: False,
+                'process_video': lambda self, *args: (None, "❌ Model initialization failed")
+            })()
+    return processor
 
 def create_interface():
     """Create and return the Gradio interface"""
+    
+    # Get processor instance
+    proc = get_processor()
     
     with gr.Blocks(title="SeedVR Video Restoration", theme=gr.themes.Soft()) as app:
         
@@ -179,8 +201,8 @@ def create_interface():
         """)
         
         # Show available models
-        if processor.available_models:
-            gr.Markdown(f"**Available Models:** {', '.join(processor.available_models)}")
+        if proc.available_models:
+            gr.Markdown(f"**Available Models:** {', '.join(proc.available_models)}")
         else:
             gr.Markdown("⚠️ **No models found!** Please ensure models are downloaded.")
         
@@ -195,8 +217,8 @@ def create_interface():
                 )
                 
                 model_choice = gr.Dropdown(
-                    choices=processor.available_models,
-                    value=processor.available_models[0] if processor.available_models else None,
+                    choices=proc.available_models,
+                    value=proc.available_models[0] if proc.available_models else None,
                     label="Model",
                     info="SeedVR2-3B is faster, SeedVR2-7B has higher quality"
                 )
@@ -259,7 +281,7 @@ def create_interface():
         
         # Event handlers
         restore_btn.click(
-            fn=processor.process_video,
+            fn=proc.process_video,
             inputs=[input_video, model_choice, output_height, output_width, seed],
             outputs=output_video,
             show_progress=True
@@ -270,12 +292,12 @@ def create_interface():
 def main():
     """Main function to launch the Gradio app"""
     
-    # Check if models are available
-    if not processor.available_models:
-        logger.error("No models found! Please run the setup script first.")
-        sys.exit(1)
+    # Initialize processor and check models
+    proc = get_processor()
+    if not proc.available_models:
+        logger.warning("No models found! The interface will still launch but video processing will not work.")
     
-    logger.info(f"Available models: {processor.available_models}")
+    logger.info(f"Available models: {proc.available_models}")
     
     # Parse environment variables
     share_gradio = os.getenv('GRADIO_SHARE', 'false').lower() in ('true', '1', 'yes', 'on')
