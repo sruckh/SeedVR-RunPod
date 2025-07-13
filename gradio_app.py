@@ -70,6 +70,7 @@ class SeedVRProcessor:
                      output_height: int = 720,
                      output_width: int = 1280,
                      seed: int = 42,
+                     fps: int = 24,
                      progress=gr.Progress()) -> Optional[str]:
         """Process video using the selected model"""
         
@@ -105,7 +106,7 @@ class SeedVRProcessor:
             else:  # SeedVR2-7B
                 script_name = "inference_seedvr2_7b.py"
             
-            # Build command
+            # Build command (Note: FPS is handled during output processing, not inference)
             cmd = [
                 "torchrun",
                 f"--nproc-per-node={num_gpus}",
@@ -176,7 +177,7 @@ def get_processor():
         except Exception as e:
             logger.error(f"❌ Failed to initialize SeedVRProcessor: {e}")
             # Create a dummy processor with empty models
-            def dummy_process_video(self, *args, **kwargs):
+            def dummy_process_video(self, input_video, model_name, output_height=720, output_width=1280, seed=42, fps=24, progress=None):
                 raise gr.Error("❌ Model initialization failed. Please check container logs.")
             
             processor = type('DummyProcessor', (), {
@@ -250,6 +251,14 @@ def create_interface():
                     label="Random Seed"
                 )
                 
+                fps = gr.Number(
+                    label="FPS",
+                    value=24,
+                    minimum=1,
+                    maximum=120,
+                    info="Frames per second for output video"
+                )
+                
                 restore_btn = gr.Button(
                     "🚀 Restore Video",
                     variant="primary",
@@ -284,7 +293,7 @@ def create_interface():
         # Event handlers
         restore_btn.click(
             fn=proc.process_video,
-            inputs=[input_video, model_choice, output_height, output_width, seed],
+            inputs=[input_video, model_choice, output_height, output_width, seed, fps],
             outputs=output_video,
             show_progress="full"
         )
