@@ -102,9 +102,9 @@ class SeedVRProcessor:
             num_gpus = torch.cuda.device_count() if torch.cuda.is_available() else 1
             
             if model_name == "SeedVR2-3B":
-                script_name = "inference_seedvr2_3b.py"
+                script_name = "projects/inference_seedvr2_3b.py"
             else:  # SeedVR2-7B
-                script_name = "inference_seedvr2_7b.py"
+                script_name = "projects/inference_seedvr2_7b.py"
             
             # Build command (Note: FPS is handled during output processing, not inference)
             cmd = [
