@@ -40,7 +40,20 @@ else:
 
 # Check if already setup
 if [ -f "/workspace/.setup_complete" ]; then
-    echo "✅ Environment already set up, skipping..."
+    echo "✅ Environment already set up, skipping package installation..."
+    
+    # Always ensure SeedVR source files are available
+    if [ ! -f "/workspace/inference_seedvr2_3b.py" ] || [ ! -f "/workspace/inference_seedvr2_7b.py" ]; then
+        echo "📥 SeedVR source files missing, downloading..."
+        # Clone SeedVR repository if not exists
+        if [ ! -d "/workspace/SeedVR" ]; then
+            git clone https://github.com/bytedance-seed/SeedVR.git /workspace/SeedVR
+        fi
+        # Copy SeedVR source files to workspace
+        echo "📂 Copying SeedVR source files..."
+        cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
+    fi
+    
     # Still verify CUDA setup
     verify_gpu_setup
     exit 0
