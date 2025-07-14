@@ -106,6 +106,15 @@ class SeedVRProcessor:
             else:  # SeedVR2-7B
                 script_name = "inference_seedvr2_7b.py"
             
+            # Verify script exists before running
+            script_path = f"/workspace/{script_name}"
+            if not Path(script_path).exists():
+                logger.error(f"Inference script not found: {script_path}")
+                logger.error("Available files in /workspace/:")
+                for file in Path("/workspace").glob("*.py"):
+                    logger.error(f"  - {file.name}")
+                raise gr.Error(f"Inference script {script_name} not found. Please check container setup.")
+            
             # Build command (Note: FPS is handled during output processing, not inference)
             cmd = [
                 "torchrun",

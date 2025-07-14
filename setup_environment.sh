@@ -52,9 +52,22 @@ if [ -f "/workspace/.setup_complete" ]; then
         # Copy SeedVR source files to workspace
         echo "📂 Copying SeedVR source files..."
         cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
-        # Copy inference scripts directly to workspace root
-        cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/ 2>/dev/null || true
-        cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/ 2>/dev/null || true
+        
+        # Copy inference scripts directly to workspace root (critical for Gradio app)
+        echo "📂 Copying inference scripts to workspace root..."
+        if [ -f "/workspace/SeedVR/projects/inference_seedvr2_3b.py" ]; then
+            cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/
+            echo "✅ Copied inference_seedvr2_3b.py"
+        else
+            echo "❌ inference_seedvr2_3b.py not found in /workspace/SeedVR/projects/"
+        fi
+
+        if [ -f "/workspace/SeedVR/projects/inference_seedvr2_7b.py" ]; then
+            cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/
+            echo "✅ Copied inference_seedvr2_7b.py"
+        else
+            echo "❌ inference_seedvr2_7b.py not found in /workspace/SeedVR/projects/"
+        fi
     fi
     
     # Still verify CUDA setup
@@ -259,9 +272,32 @@ fi
 # Copy SeedVR source files to workspace
 echo "📂 Copying SeedVR source files..."
 cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
-# Copy inference scripts directly to workspace root
-cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/ 2>/dev/null || true
-cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/ 2>/dev/null || true
+
+# Copy inference scripts directly to workspace root (critical for Gradio app)
+echo "📂 Copying inference scripts to workspace root..."
+if [ -f "/workspace/SeedVR/projects/inference_seedvr2_3b.py" ]; then
+    cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/
+    echo "✅ Copied inference_seedvr2_3b.py"
+else
+    echo "❌ inference_seedvr2_3b.py not found in /workspace/SeedVR/projects/"
+fi
+
+if [ -f "/workspace/SeedVR/projects/inference_seedvr2_7b.py" ]; then
+    cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/
+    echo "✅ Copied inference_seedvr2_7b.py"
+else
+    echo "❌ inference_seedvr2_7b.py not found in /workspace/SeedVR/projects/"
+fi
+
+# Verify scripts are in place
+echo "🔍 Verifying inference scripts..."
+if [ -f "/workspace/inference_seedvr2_3b.py" ] && [ -f "/workspace/inference_seedvr2_7b.py" ]; then
+    echo "✅ Both inference scripts are available"
+else
+    echo "❌ Missing inference scripts:"
+    [ ! -f "/workspace/inference_seedvr2_3b.py" ] && echo "  - inference_seedvr2_3b.py"
+    [ ! -f "/workspace/inference_seedvr2_7b.py" ] && echo "  - inference_seedvr2_7b.py"
+fi
 
 # Setup GPU environment
 setup_gpu_environment
