@@ -52,6 +52,9 @@ if [ -f "/workspace/.setup_complete" ]; then
         # Copy SeedVR source files to workspace
         echo "📂 Copying SeedVR source files..."
         cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
+        # Copy inference scripts directly to workspace root
+        cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/ 2>/dev/null || true
+        cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/ 2>/dev/null || true
     fi
     
     # Still verify CUDA setup
@@ -256,6 +259,9 @@ fi
 # Copy SeedVR source files to workspace
 echo "📂 Copying SeedVR source files..."
 cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
+# Copy inference scripts directly to workspace root
+cp /workspace/SeedVR/projects/inference_seedvr2_3b.py /workspace/ 2>/dev/null || true
+cp /workspace/SeedVR/projects/inference_seedvr2_7b.py /workspace/ 2>/dev/null || true
 
 # Setup GPU environment
 setup_gpu_environment
