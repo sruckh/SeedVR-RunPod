@@ -119,7 +119,7 @@ class SeedVRProcessor:
             cmd = [
                 "torchrun",
                 f"--nproc-per-node={num_gpus}",
-                f"/workspace/{script_name}",
+                script_name,
                 "--video_path", str(temp_input.parent),
                 "--output_dir", output_dir,
                 "--seed", str(seed),
