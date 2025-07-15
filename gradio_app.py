@@ -107,32 +107,68 @@ class SeedVRProcessor:
                 script_filename = "inference_seedvr2_7b.py"
             
             # Check multiple possible locations for the script
-            possible_paths = [
-                f"/workspace/projects/{script_filename}",
-                f"/workspace/SeedVR/projects/{script_filename}",
-                f"/workspace/{script_filename}"
+            possible_configs = [
+                {
+                    "script_path": f"projects/{script_filename}",
+                    "cwd": "/workspace",
+                    "abs_path": f"/workspace/projects/{script_filename}"
+                },
+                {
+                    "script_path": f"projects/{script_filename}", 
+                    "cwd": "/workspace/SeedVR",
+                    "abs_path": f"/workspace/SeedVR/projects/{script_filename}"
+                },
+                {
+                    "script_path": script_filename,
+                    "cwd": "/workspace", 
+                    "abs_path": f"/workspace/{script_filename}"
+                }
             ]
             
-            script_path = None
-            for path in possible_paths:
-                if Path(path).exists():
-                    script_path = path
+            script_config = None
+            for config in possible_configs:
+                if Path(config["abs_path"]).exists():
+                    script_config = config
                     break
             
-            if not script_path:
-                logger.error(f"Inference script {script_filename} not found in any expected location:")
-                for path in possible_paths:
-                    logger.error(f"  - {path} (exists: {Path(path).exists()})")
-                logger.error("Available files in /workspace/:")
-                for file in Path("/workspace").glob("**/*.py"):
-                    logger.error(f"  - {file}")
-                raise gr.Error(f"Inference script {script_filename} not found. Please check container setup.")
+            if not script_config:
+                # Try to fix missing scripts by copying from SeedVR repo if available
+                logger.warning(f"Inference script {script_filename} not found, attempting recovery...")
+                
+                if Path("/workspace/SeedVR/projects").exists():
+                    logger.info("Found SeedVR source, attempting to copy missing scripts...")
+                    try:
+                        import subprocess
+                        result = subprocess.run(
+                            ["cp", "-r", "/workspace/SeedVR/projects", "/workspace/"],
+                            capture_output=True, text=True
+                        )
+                        if result.returncode == 0:
+                            logger.info("✅ Successfully copied SeedVR projects directory")
+                            # Retry finding the script
+                            for config in possible_configs:
+                                if Path(config["abs_path"]).exists():
+                                    script_config = config
+                                    break
+                        else:
+                            logger.error(f"Failed to copy SeedVR projects: {result.stderr}")
+                    except Exception as e:
+                        logger.error(f"Error copying SeedVR projects: {e}")
+                
+                if not script_config:
+                    logger.error(f"Inference script {script_filename} not found in any expected location:")
+                    for config in possible_configs:
+                        logger.error(f"  - {config['abs_path']} (exists: {Path(config['abs_path']).exists()})")
+                    logger.error("Available files in /workspace/:")
+                    for file in Path("/workspace").glob("**/*.py"):
+                        logger.error(f"  - {file}")
+                    raise gr.Error(f"Inference script {script_filename} not found. Please check container setup.")
             
             # Build command (Note: FPS is handled during output processing, not inference)
             cmd = [
                 "torchrun",
                 f"--nproc-per-node={num_gpus}",
-                script_path,
+                script_config["script_path"],
                 "--video_path", str(temp_input.parent),
                 "--output_dir", output_dir,
                 "--seed", str(seed),
@@ -143,11 +179,11 @@ class SeedVRProcessor:
             
             # Run inference
             progress(0.4, desc="Running inference (this may take several minutes)...")
-            logger.info(f"Running command: {' '.join(cmd)}")
+            logger.info(f"Running command: {' '.join(cmd)} (cwd: {script_config['cwd']})")
             
             result = subprocess.run(
                 cmd,
-                cwd="/workspace",
+                cwd=script_config["cwd"],
                 capture_output=True,
                 text=True,
                 timeout=1800  # 30 minute timeout
