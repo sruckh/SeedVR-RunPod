@@ -102,24 +102,37 @@ class SeedVRProcessor:
             num_gpus = torch.cuda.device_count() if torch.cuda.is_available() else 1
             
             if model_name == "SeedVR2-3B":
-                script_name = "projects/inference_seedvr2_3b.py"
+                script_filename = "inference_seedvr2_3b.py"
             else:  # SeedVR2-7B
-                script_name = "projects/inference_seedvr2_7b.py"
+                script_filename = "inference_seedvr2_7b.py"
             
-            # Verify script exists before running
-            script_path = f"/workspace/{script_name}"
-            if not Path(script_path).exists():
-                logger.error(f"Inference script not found: {script_path}")
+            # Check multiple possible locations for the script
+            possible_paths = [
+                f"/workspace/projects/{script_filename}",
+                f"/workspace/SeedVR/projects/{script_filename}",
+                f"/workspace/{script_filename}"
+            ]
+            
+            script_path = None
+            for path in possible_paths:
+                if Path(path).exists():
+                    script_path = path
+                    break
+            
+            if not script_path:
+                logger.error(f"Inference script {script_filename} not found in any expected location:")
+                for path in possible_paths:
+                    logger.error(f"  - {path} (exists: {Path(path).exists()})")
                 logger.error("Available files in /workspace/:")
-                for file in Path("/workspace").glob("*.py"):
-                    logger.error(f"  - {file.name}")
-                raise gr.Error(f"Inference script {script_name} not found. Please check container setup.")
+                for file in Path("/workspace").glob("**/*.py"):
+                    logger.error(f"  - {file}")
+                raise gr.Error(f"Inference script {script_filename} not found. Please check container setup.")
             
             # Build command (Note: FPS is handled during output processing, not inference)
             cmd = [
                 "torchrun",
                 f"--nproc-per-node={num_gpus}",
-                script_name,
+                script_path,
                 "--video_path", str(temp_input.parent),
                 "--output_dir", output_dir,
                 "--seed", str(seed),
