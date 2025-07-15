@@ -117,11 +117,6 @@ class SeedVRProcessor:
                     "script_path": f"projects/{script_filename}", 
                     "cwd": "/workspace/SeedVR",
                     "abs_path": f"/workspace/SeedVR/projects/{script_filename}"
-                },
-                {
-                    "script_path": script_filename,
-                    "cwd": "/workspace", 
-                    "abs_path": f"/workspace/{script_filename}"
                 }
             ]
             
@@ -179,7 +174,10 @@ class SeedVRProcessor:
             
             # Run inference
             progress(0.4, desc="Running inference (this may take several minutes)...")
-            logger.info(f"Running command: {' '.join(cmd)} (cwd: {script_config['cwd']})")
+            logger.info(f"✅ Found script at: {script_config['abs_path']}")
+            logger.info(f"📂 Working directory: {script_config['cwd']}")
+            logger.info(f"📄 Script path for torchrun: {script_config['script_path']}")
+            logger.info(f"🚀 Full command: {' '.join(cmd)}")
             
             result = subprocess.run(
                 cmd,
