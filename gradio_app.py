@@ -109,6 +109,11 @@ class SeedVRProcessor:
             # Check multiple possible locations for the script
             possible_configs = [
                 {
+                    "script_path": script_filename,
+                    "cwd": "/workspace",
+                    "abs_path": f"/workspace/{script_filename}"
+                },
+                {
                     "script_path": f"projects/{script_filename}",
                     "cwd": "/workspace",
                     "abs_path": f"/workspace/projects/{script_filename}"
@@ -130,25 +135,35 @@ class SeedVRProcessor:
                 # Try to fix missing scripts by copying from SeedVR repo if available
                 logger.warning(f"Inference script {script_filename} not found, attempting recovery...")
                 
-                if Path("/workspace/SeedVR/projects").exists():
-                    logger.info("Found SeedVR source, attempting to copy missing scripts...")
-                    try:
-                        import subprocess
-                        result = subprocess.run(
-                            ["cp", "-r", "/workspace/SeedVR/projects", "/workspace/"],
-                            capture_output=True, text=True
-                        )
-                        if result.returncode == 0:
-                            logger.info("✅ Successfully copied SeedVR projects directory")
-                            # Retry finding the script
-                            for config in possible_configs:
-                                if Path(config["abs_path"]).exists():
-                                    script_config = config
-                                    break
-                        else:
-                            logger.error(f"Failed to copy SeedVR projects: {result.stderr}")
-                    except Exception as e:
-                        logger.error(f"Error copying SeedVR projects: {e}")
+                # Copy individual script files to /workspace/ where torchrun expects them
+                script_sources = [
+                    f"/workspace/SeedVR/projects/{script_filename}",
+                    f"/workspace/projects/{script_filename}"
+                ]
+                
+                for source in script_sources:
+                    if Path(source).exists():
+                        logger.info(f"Found script at {source}, copying to /workspace/")
+                        try:
+                            import subprocess
+                            result = subprocess.run(
+                                ["cp", source, f"/workspace/{script_filename}"],
+                                capture_output=True, text=True
+                            )
+                            if result.returncode == 0:
+                                logger.info(f"✅ Successfully copied {script_filename} to /workspace/")
+                                # Set script_config to use the copied script
+                                script_config = {
+                                    "script_path": script_filename,
+                                    "cwd": "/workspace",
+                                    "abs_path": f"/workspace/{script_filename}"
+                                }
+                                break
+                            else:
+                                logger.error(f"Failed to copy script: {result.stderr}")
+                        except Exception as e:
+                            logger.error(f"Error copying script: {e}")
+                        break
                 
                 if not script_config:
                     logger.error(f"Inference script {script_filename} not found in any expected location:")
