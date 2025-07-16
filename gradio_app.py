@@ -145,7 +145,6 @@ class SeedVRProcessor:
                     if Path(source).exists():
                         logger.info(f"Found script at {source}, copying to /workspace/")
                         try:
-                            import subprocess
                             result = subprocess.run(
                                 ["cp", source, f"/workspace/{script_filename}"],
                                 capture_output=True, text=True
@@ -248,16 +247,18 @@ def get_processor():
         except Exception as e:
             logger.error(f"❌ Failed to initialize SeedVRProcessor: {e}")
             # Create a dummy processor with empty models
-            def dummy_process_video(self, input_video, model_name, output_height=720, output_width=1280, seed=42, fps=24, progress=None):
-                raise gr.Error("❌ Model initialization failed. Please check container logs.")
+            class DummyProcessor:
+                available_models = []
+                current_model = None
+                model_loaded = False
+                
+                def load_model(self, x):
+                    return False
+                    
+                def process_video(self, input_video, model_name, output_height=720, output_width=1280, seed=42, fps=24, progress=None):
+                    raise gr.Error("❌ Model initialization failed. Please check container logs.")
             
-            processor = type('DummyProcessor', (), {
-                'available_models': [],
-                'current_model': None,
-                'model_loaded': False,
-                'load_model': lambda self, x: False,
-                'process_video': dummy_process_video
-            })()
+            processor = DummyProcessor()
     return processor
 
 def create_interface():
