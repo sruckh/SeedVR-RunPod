@@ -12,6 +12,7 @@ import tempfile
 import shutil
 from pathlib import Path
 import subprocess
+from subprocess import TimeoutExpired
 import time
 from typing import Optional, Tuple
 import logging
@@ -225,7 +226,7 @@ class SeedVRProcessor:
             
             return str(final_output)
             
-        except subprocess.TimeoutExpired:
+        except TimeoutExpired:
             raise gr.Error("Video processing timed out (30 minutes). Try with a shorter video or lower resolution.")
         except Exception as e:
             logger.error(f"Error processing video: {str(e)}")
