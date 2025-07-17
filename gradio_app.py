@@ -142,28 +142,20 @@ class SeedVRProcessor:
                     f"/workspace/projects/{script_filename}"
                 ]
                 
-                for source in script_sources:
-                    if Path(source).exists():
-                        logger.info(f"Found script at {source}, copying to /workspace/")
-                        try:
-                            result = subprocess.run(
-                                ["cp", source, f"/workspace/{script_filename}"],
-                                capture_output=True, text=True
-                            )
-                            if result.returncode == 0:
-                                logger.info(f"✅ Successfully copied {script_filename} to /workspace/")
-                                # Set script_config to use the copied script
-                                script_config = {
-                                    "script_path": script_filename,
-                                    "cwd": "/workspace",
-                                    "abs_path": f"/workspace/{script_filename}"
-                                }
-                                break
-                            else:
-                                logger.error(f"Failed to copy script: {result.stderr}")
-                        except Exception as e:
-                            logger.error(f"Error copying script: {e}")
-                        break
+                # Copy entire projects directory from model dir to ensure dependencies are available
+                source_dir = f"/workspace/ckpts/{model_name}/projects"
+                target_dir = "/workspace/projects"
+                try:
+                    shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
+                    logger.info(f"✅ Successfully copied projects from {model_name} to /workspace/projects")
+                    script_config = {
+                        "script_path": f"projects/{script_filename}",
+                        "cwd": "/workspace",
+                        "abs_path": f"/workspace/projects/{script_filename}"
+                    }
+                except Exception as e:
+                    logger.error(f"Error copying projects directory: {e}")
+                    raise gr.Error(f"Failed to prepare runtime environment: {str(e)}")
                 
                 if not script_config:
                     logger.error(f"Inference script {script_filename} not found in any expected location:")
