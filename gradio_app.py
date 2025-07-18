@@ -155,7 +155,36 @@ class SeedVRProcessor:
                     }
                 except Exception as e:
                     logger.error(f"Error copying projects directory: {e}")
-                    raise gr.Error(f"Failed to prepare runtime environment: {str(e)}")
+                    
+                    # Try alternative: copy from SeedVR repo directly
+                    try:
+                        if Path("/workspace/SeedVR/projects").exists():
+                            shutil.copytree("/workspace/SeedVR/projects", target_dir, dirs_exist_ok=True)
+                            logger.info(f"✅ Successfully copied projects from SeedVR repo to /workspace/projects")
+                            
+                            # Also copy models directory and other dependencies
+                            if Path("/workspace/SeedVR/models").exists():
+                                shutil.copytree("/workspace/SeedVR/models", "/workspace/models", dirs_exist_ok=True)
+                                logger.info(f"✅ Successfully copied models directory to /workspace/models")
+                            
+                            # Copy other essential directories
+                            for dir_name in ["data", "scripts", "configs", "utils"]:
+                                src_path = Path(f"/workspace/SeedVR/{dir_name}")
+                                dst_path = Path(f"/workspace/{dir_name}")
+                                if src_path.exists():
+                                    shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+                                    logger.info(f"✅ Successfully copied {dir_name} directory")
+                                    
+                            script_config = {
+                                "script_path": f"projects/{script_filename}",
+                                "cwd": "/workspace",
+                                "abs_path": f"/workspace/projects/{script_filename}"
+                            }
+                        else:
+                            raise gr.Error(f"SeedVR repository not found at /workspace/SeedVR")
+                    except Exception as e2:
+                        logger.error(f"Error copying from SeedVR repo: {e2}")
+                        raise gr.Error(f"Failed to prepare runtime environment: {str(e2)}")
                 
                 if not script_config:
                     logger.error(f"Inference script {script_filename} not found in any expected location:")
@@ -166,17 +195,10 @@ class SeedVRProcessor:
                         logger.error(f"  - {file}")
                     raise gr.Error(f"Inference script {script_filename} not found. Please check container setup.")
             
-            # Build command (Note: FPS is handled during output processing, not inference)
+            # Build command with environment sourcing
             cmd = [
-                "torchrun",
-                f"--nproc-per-node={num_gpus}",
-                script_config["script_path"],
-                "--video_path", str(temp_input.parent),
-                "--output_dir", output_dir,
-                "--seed", str(seed),
-                "--res_h", str(output_height),
-                "--res_w", str(output_width),
-                "--sp_size", str(num_gpus)
+                "bash", "-c",
+                f"source /workspace/.env 2>/dev/null || true && torchrun --nproc-per-node={num_gpus} {script_config['script_path']} --video_path {temp_input.parent} --output_dir {output_dir} --seed {seed} --res_h {output_height} --res_w {output_width} --sp_size {num_gpus}"
             ]
             
             # Run inference

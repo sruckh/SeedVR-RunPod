@@ -9,6 +9,7 @@ ENV PIP_NO_CACHE_DIR=1
 ENV TORCH_HOME=/workspace/cache
 ENV HF_HOME=/workspace/cache/huggingface
 ENV CUDA_HOME=/usr/local/cuda
+ENV PYTHONPATH="/workspace:$PYTHONPATH"
 
 # Gradio configuration (can be overridden at runtime)
 ENV GRADIO_SHARE=false
@@ -62,7 +63,7 @@ RUN wget -O /workspace/src/color_fix.py https://raw.githubusercontent.com/pkuliy
 # These are downloaded dynamically to match the exact CUDA environment
 
 # Default command runs the setup and then the Gradio app
-CMD ["bash", "-c", "/workspace/setup_environment.sh && python gradio_app.py"]
+CMD ["bash", "-c", "/workspace/setup_environment.sh && export PYTHONPATH=/workspace:$PYTHONPATH && python gradio_app.py"]
 
 # Expose Gradio port
 EXPOSE 7860

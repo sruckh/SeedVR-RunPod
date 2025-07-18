@@ -253,9 +253,14 @@ if [ ! -d "/workspace/SeedVR" ]; then
     git clone https://github.com/bytedance-seed/SeedVR.git /workspace/SeedVR
 fi
 
-# Copy SeedVR source files to workspace
+# Copy SeedVR source files to workspace with proper structure
 echo "📂 Copying SeedVR source files..."
 cp -r /workspace/SeedVR/* /workspace/ 2>/dev/null || true
+
+# Ensure proper Python path structure
+echo "🔧 Setting up Python module structure..."
+# Add /workspace to Python path for imports
+export PYTHONPATH="/workspace:$PYTHONPATH"
 
 # Verify inference scripts are available in projects directory
 echo "🔍 Verifying inference scripts in projects directory..."
@@ -266,6 +271,40 @@ else
     [ ! -f "/workspace/projects/inference_seedvr2_3b.py" ] && echo "  - inference_seedvr2_3b.py"
     [ ! -f "/workspace/projects/inference_seedvr2_7b.py" ] && echo "  - inference_seedvr2_7b.py"
 fi
+
+# Verify models directory exists
+echo "🔍 Verifying models directory structure..."
+if [ -d "/workspace/models" ]; then
+    echo "✅ Models directory exists at /workspace/models"
+    ls -la /workspace/models/ | head -10
+else
+    echo "❌ Models directory not found at /workspace/models"
+    echo "📋 Available directories in /workspace:"
+    ls -la /workspace/ | grep "^d"
+fi
+
+# Ensure all necessary directories from SeedVR are available
+echo "🔧 Ensuring complete SeedVR structure is available..."
+for dir in models data scripts configs utils; do
+    if [ -d "/workspace/SeedVR/$dir" ] && [ ! -d "/workspace/$dir" ]; then
+        echo "📂 Copying $dir directory to workspace..."
+        cp -r "/workspace/SeedVR/$dir" "/workspace/$dir"
+    fi
+done
+
+# Ensure __init__.py files exist for Python imports
+echo "🔧 Adding __init__.py files for Python imports..."
+for dir in models data scripts configs utils; do
+    if [ -d "/workspace/$dir" ] && [ ! -f "/workspace/$dir/__init__.py" ]; then
+        touch "/workspace/$dir/__init__.py"
+    fi
+done
+
+# Final verification of critical files
+echo "🔍 Final verification of critical files..."
+echo "  - /workspace/projects/: $(ls -la /workspace/projects/ 2>/dev/null | wc -l) files"
+echo "  - /workspace/models/: $(ls -la /workspace/models/ 2>/dev/null | wc -l) files"
+echo "  - /workspace/: $(ls -la /workspace/ 2>/dev/null | wc -l) total files"
 
 # Setup GPU environment
 setup_gpu_environment
@@ -292,6 +331,17 @@ python /workspace/download_models.py
 
 # Final verification
 verify_gpu_setup
+
+# Create environment file for persistent settings
+echo "📝 Creating environment configuration..."
+cat > /workspace/.env << 'EOF'
+export PYTHONPATH="/workspace:$PYTHONPATH"
+export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+export RANK=0
+export LOCAL_RANK=0
+export WORLD_SIZE=1
+export NNODES=1
+EOF
 
 # Mark setup as complete
 touch /workspace/.setup_complete
