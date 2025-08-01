@@ -21,7 +21,7 @@ pyyaml==6.0.2
 # Gradio and web interface
 gradio==4.44.0
 pydantic==2.10.6
-matplotlib==3.9.0
+matplotlib==3.9.4
 
 # Video processing
 ffmpeg-python==0.2.0
