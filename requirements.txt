@@ -4,7 +4,7 @@ omegaconf==2.3.0
 opencv-python==4.9.0.80
 diffusers==0.29.1
 rotary-embedding-torch==0.5.3
-transformers==4.38.2
+transformers==4.54.1
 mediapy==1.2.0
 
 # Additional dependencies from environment.yml (filtered for relevance)
