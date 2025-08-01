@@ -9,7 +9,7 @@ mediapy==1.2.0
 
 # Additional dependencies from environment.yml (filtered for relevance)
 accelerate==0.33.0
-huggingface-hub==0.32.2
+huggingface-hub==0.34.3
 safetensors==0.4.3
 numpy==1.24.4
 pillow==10.3.0
