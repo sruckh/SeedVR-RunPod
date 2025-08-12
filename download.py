@@ -4,7 +4,6 @@ from huggingface_hub import snapshot_download
 def download_model(repo_id, local_dir_name):
     """Downloads a model from Hugging Face Hub."""
     save_dir = "ckpts"
-    cache_dir = os.path.join(save_dir, "cache")
     local_dir = os.path.join(save_dir, local_dir_name)
 
     print(f"--- Downloading model: {repo_id} ---")
@@ -14,9 +13,6 @@ def download_model(repo_id, local_dir_name):
         snapshot_download(
             repo_id=repo_id,
             local_dir=local_dir,
-            cache_dir=cache_dir,
-            local_dir_use_symlinks=False,
-            resume_download=True,
             allow_patterns=["*.json", "*.safetensors", "*.pth", "*.bin", "*.py", "*.md", "*.txt", "*.yaml", "*.yml"],
         )
         print(f"--- Successfully downloaded {repo_id} ---")
