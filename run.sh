@@ -35,6 +35,8 @@ echo "      Done."
 # 4. Install the specific flash-attention wheel
 echo "[4/8] Installing flash-attention wheel..."
 pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.9.post1/flash_attn-2.5.9.post1+cu122torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+echo "      Installing Gradio..."
+pip install gradio
 echo "      Done."
 
 # 5. Patch inference scripts to point to correct model paths
