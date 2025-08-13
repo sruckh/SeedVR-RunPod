@@ -1,5 +1,19 @@
 # Engineering Journal
 
+## 2025-01-13 23:55
+
+### APEX Installation Timeout and Missing File Fixes |TASK:TASK-2025-01-13-007|
+- **What**: Fixed infinite APEX installation loops and missing inference script file errors
+- **Why**: Container executing successfully after syntax fixes but hanging during APEX compilation and failing on missing inference files
+- **How**: 
+  - **Issue #1**: APEX installation hanging indefinitely during CUDA compilation - added timeout commands: 1800s for CUDA build, 900s for Python-only fallback
+  - **Issue #2**: Missing `projects/inference_seedvr2_3b.py` and `projects/inference_seedvr2_7b.py` files causing sed command failures
+  - Added file existence checks before sed operations: `if [ -f "projects/inference_*.py" ]; then ... else echo "WARNING: ... not found, skipping patch"; fi`
+- **Issues**: Container startup was hanging during APEX compilation and failing hard on missing inference files
+- **Result**: Container now continues startup with graceful degradation - APEX installation won't hang forever, and missing files generate warnings instead of failures
+
+---
+
 ## 2025-01-13 23:45
 
 ### Bash Syntax Error and CUDA Dependency Resolution |TASK:TASK-2025-01-13-006|

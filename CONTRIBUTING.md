@@ -1,149 +1,336 @@
-# Contributing to SeedVR-RunPod
+# CONTRIBUTING.md
 
-Thank you for your interest in contributing to SeedVR-RunPod! This guide will help you get started.
+## Welcome Contributors! 👋
 
-## 🤝 How to Contribute
+We're excited that you're interested in contributing to this project. This document provides guidelines and instructions for contributing.
 
-### Reporting Issues
-- Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) for bugs
-- Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md) for new features
-- Search existing issues before creating a new one
-- Include as much detail as possible (logs, environment, steps to reproduce)
+## Code of Conduct
 
-### Pull Requests
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Test thoroughly (see Testing section below)
-5. Commit with clear messages (`git commit -m 'Add amazing feature'`)
-6. Push to your branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request using our [template](.github/pull_request_template.md)
+### Our Standards
+- Be respectful and inclusive
+- Welcome newcomers and help them get started
+- Accept constructive criticism gracefully
+- Focus on what's best for the community
+- Show empathy towards other contributors
 
-## 🧪 Testing
+### Unacceptable Behavior
+- Harassment or discriminatory language
+- Personal attacks or trolling
+- Publishing others' private information
+- Other conduct deemed inappropriate
 
-### Local Testing
-```bash
-# Build the container
-docker build -t seedvr-runpod:test .
-
-# Test with environment variables
-docker run --gpus all -p 7860:7860 \
-  -e GRADIO_SHARE=true \
-  -e HF_TOKEN=your_token \
-  seedvr-runpod:test
-```
-
-### RunPod Testing
-- Test deployment on RunPod with different GPU configurations
-- Verify model downloads work correctly
-- Check Gradio interface functionality
-- Test both SeedVR2-3B and SeedVR2-7B models
-
-### Required Test Cases
-- [ ] Container builds successfully
-- [ ] Setup script completes without errors
-- [ ] Models download correctly
-- [ ] GPU detection and CUDA verification works
-- [ ] Gradio interface launches and is accessible
-- [ ] Video processing completes successfully
-- [ ] Environment variables are respected
-
-## 📝 Code Style
-
-### Shell Scripts
-- Use `set -e` for error handling
-- Include comprehensive error checking
-- Add retry logic for network operations
-- Use meaningful function names
-- Include progress indicators and logging
-
-### Python Code
-- Follow PEP 8 style guidelines
-- Include type hints where appropriate
-- Add comprehensive error handling
-- Use logging instead of print statements
-- Include docstrings for functions
-
-### Docker
-- Use multi-stage builds when beneficial
-- Minimize layer count
-- Clean up package managers after installation
-- Use specific versions for reproducibility
-- Add meaningful labels and comments
-
-## 🎯 Areas for Contribution
-
-### High Priority
-- Performance optimizations
-- Additional model support
-- Better error messages and diagnostics
-- Memory usage optimization
-- Multi-GPU improvements
-
-### Medium Priority
-- Additional output formats
-- Batch processing capabilities
-- API endpoints beyond Gradio
-- Integration with other platforms
-- Documentation improvements
-
-### Good First Issues
-- README improvements
-- Example scripts
-- Error message clarifications
-- Configuration validation
-- Log formatting enhancements
-
-## 🚀 Development Setup
+## Getting Started
 
 ### Prerequisites
-- Docker with GPU support
-- Python 3.10+
-- Access to GPU for testing
-- Hugging Face account (for model downloads)
-
-### Development Environment
 ```bash
-# Clone your fork
-git clone https://github.com/sruckh/SeedVR-RunPod.git
-cd SeedVR-RunPod
+# Required tools
+- Node.js >= 16.0.0
+- Git
+- [Other requirements]
 
-# Create development branch
-git checkout -b feature/your-feature
-
-# Build and test locally
-docker build -t seedvr-runpod:dev .
+# Optional but recommended
+- VS Code or similar editor
+- [Development tools]
 ```
 
-### Environment Variables for Testing
+### Development Setup
 ```bash
-export HF_TOKEN=your_huggingface_token
-export GRADIO_SHARE=false
-export GRADIO_PORT=7860
-export CUDA_VISIBLE_DEVICES=0
+# 1. Fork the repository
+# 2. Clone your fork
+git clone https://github.com/YOUR_USERNAME/PROJECT_NAME.git
+cd PROJECT_NAME
+
+# 3. Add upstream remote
+git remote add upstream https://github.com/ORIGINAL_OWNER/PROJECT_NAME.git
+
+# 4. Install dependencies
+npm install
+
+# 5. Create a branch
+git checkout -b feature/your-feature-name
+
+# 6. Start development server
+npm run dev
 ```
 
-## 📋 Release Process
+## Development Workflow
 
-1. Update version numbers in relevant files
-2. Update CHANGELOG.md with new features/fixes
-3. Test thoroughly on multiple GPU configurations
-4. Create release PR
-5. Tag release after merge
-6. GitHub Actions will build and push to Docker Hub
+### Branch Naming
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation updates
+- `refactor/` - Code refactoring
+- `test/` - Test additions/updates
+- `chore/` - Maintenance tasks
 
-## ❓ Questions?
+### Making Changes
+1. **Update your fork**
+   ```bash
+   git fetch upstream
+   git checkout main
+   git merge upstream/main
+   ```
 
-- Open a [Discussion](https://github.com/sruckh/SeedVR-RunPod/discussions) for general questions
-- Check existing [Issues](https://github.com/sruckh/SeedVR-RunPod/issues) for known problems
-- Review the [README](README.md) and [RunPod deployment guide](RUNPOD_DEPLOYMENT.md)
+2. **Create feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
 
-## 🙏 Acknowledgments
+3. **Make your changes**
+   - Write clean, readable code
+   - Follow existing patterns
+   - Add tests for new features
+   - Update documentation
 
-- **ByteDance**: For the original SeedVR research and models
-- **RunPod**: For the cloud GPU platform
-- **Contributors**: Everyone who helps improve this project
+4. **Test your changes**
+   ```bash
+   npm test
+   npm run lint
+   npm run build
+   ```
 
----
+## Code Style Guide
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+### JavaScript/TypeScript
+```javascript
+// Use meaningful variable names
+const userEmail = 'user@example.com'; // ✅
+const e = 'user@example.com'; // ❌
+
+// Prefer const over let
+const MAX_RETRIES = 3; // ✅
+let MAX_RETRIES = 3; // ❌
+
+// Use async/await over promises
+async function fetchUser(id) {
+  const user = await api.getUser(id); // ✅
+  return user;
+}
+
+// Add JSDoc comments for functions
+/**
+ * Calculates the total price including tax
+ * @param {number} price - Base price
+ * @param {number} taxRate - Tax rate as decimal
+ * @returns {number} Total price with tax
+ */
+function calculateTotal(price, taxRate) {
+  return price * (1 + taxRate);
+}
+```
+
+### File Organization
+```
+src/
+├── components/      # Reusable components
+│   ├── Button/
+│   │   ├── Button.js
+│   │   ├── Button.test.js
+│   │   └── Button.css
+├── services/        # API and external services
+├── utils/          # Helper functions
+├── hooks/          # Custom React hooks (if applicable)
+└── types/          # TypeScript types/interfaces
+```
+
+### Naming Conventions
+- **Files**: camelCase for JS/TS, PascalCase for components
+- **Variables**: camelCase
+- **Constants**: UPPER_SNAKE_CASE
+- **Classes/Types**: PascalCase
+- **CSS Classes**: kebab-case or BEM
+
+## Commit Guidelines
+
+### Commit Message Format
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Code style changes (formatting, etc)
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `perf`: Performance improvement
+- `test`: Adding missing tests
+- `chore`: Changes to build process or auxiliary tools
+
+### Examples
+```bash
+# Good commit messages
+feat(auth): add OAuth2 login support
+fix(api): handle null response in user endpoint
+docs: update installation instructions
+refactor(utils): simplify date formatting logic
+
+# Bad commit messages
+fix: fixed stuff
+update code
+WIP
+```
+
+### Commit Best Practices
+- Keep commits atomic (one logical change per commit)
+- Write clear, descriptive commit messages
+- Reference issues when applicable: `fixes #123`
+
+## Pull Request Process
+
+### Before Submitting
+- [ ] Code follows style guidelines
+- [ ] Self-review of code performed
+- [ ] Comments added for complex logic
+- [ ] Documentation updated
+- [ ] Tests added/updated
+- [ ] All tests passing
+- [ ] Lint checks passing
+- [ ] Build successful
+
+### PR Template
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing completed
+
+## Checklist
+- [ ] My code follows the project style
+- [ ] I've added tests for my changes
+- [ ] I've updated documentation
+- [ ] I've added changeset if needed
+
+## Related Issues
+Fixes #(issue number)
+
+## Screenshots (if applicable)
+```
+
+### Review Process
+1. Submit PR with clear description
+2. Address reviewer feedback
+3. Keep PR updated with main branch
+4. Squash commits if requested
+5. Delete branch after merge
+
+## Testing Guidelines
+
+### Writing Tests
+```javascript
+// Test file naming
+- component.test.js
+- service.spec.js
+- utils.test.ts
+
+// Test structure
+describe('ComponentName', () => {
+  describe('methodName', () => {
+    it('should do something specific', () => {
+      // Arrange
+      const input = 'test';
+      
+      // Act
+      const result = functionUnderTest(input);
+      
+      // Assert
+      expect(result).toBe('expected');
+    });
+  });
+});
+```
+
+### Test Coverage
+- Aim for 80%+ coverage
+- Test edge cases
+- Test error scenarios
+- Don't test implementation details
+
+## Documentation
+
+### Code Documentation
+- Add JSDoc comments to public APIs
+- Include examples in documentation
+- Keep README up to date
+- Document breaking changes
+
+### API Documentation
+```javascript
+/**
+ * @api {post} /users Create user
+ * @apiName CreateUser
+ * @apiGroup User
+ * 
+ * @apiParam {String} email User email
+ * @apiParam {String} password User password
+ * 
+ * @apiSuccess {String} id User ID
+ * @apiSuccess {String} email User email
+ * 
+ * @apiError {Object} 400 Validation error
+ * @apiError {Object} 409 Email already exists
+ */
+```
+
+## Release Process
+
+### Versioning
+We use [Semantic Versioning](https://semver.org/):
+- MAJOR: Breaking changes
+- MINOR: New features (backwards compatible)
+- PATCH: Bug fixes
+
+### Creating a Release
+1. Update version in package.json
+2. Update CHANGELOG.md
+3. Create git tag: `git tag v1.2.3`
+4. Push tag: `git push origin v1.2.3`
+
+## Getting Help
+
+### Resources
+- [Project Documentation](./docs)
+- [Issue Tracker](https://github.com/owner/repo/issues)
+- [Discussions](https://github.com/owner/repo/discussions)
+- [Discord/Slack Community](#)
+
+### Asking Questions
+- Search existing issues first
+- Use discussions for questions
+- Provide context and examples
+- Be patient and respectful
+
+## Recognition
+
+### Contributors
+All contributors are recognized in:
+- README.md contributors section
+- GitHub contributors page
+- Release notes
+
+### First-Time Contributors
+We especially welcome first-time contributors! Look for issues labeled:
+- `good first issue`
+- `help wanted`
+- `beginner friendly`
+
+## Keywords <!-- #keywords -->
+- contributing
+- development
+- workflow
+- pull request
+- code style
+- testing

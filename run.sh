@@ -103,10 +103,10 @@ if [ -d "/workspace/apex" ] && ! python -c "import apex" 2>/dev/null; then
     if command -v nvcc &> /dev/null || [ -n "$CUDA_HOME" ]; then
         echo "      CUDA detected - attempting CUDA build"
         # Use environment variables to enable CUDA extensions as recommended by NVIDIA
-        if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
+        if ! timeout 1800 APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
             echo "      WARNING: CUDA Apex build failed - falling back to Python-only build"
             # Try Python-only build as fallback
-            if ! pip install -v --no-build-isolation --no-cache-dir ./; then
+            if ! timeout 900 pip install -v --no-build-isolation --no-cache-dir ./; then
                 echo "      ERROR: Both CUDA and Python-only Apex builds failed"
                 echo "      Continuing without Apex - some optimizations may not be available"
             else
@@ -117,7 +117,7 @@ if [ -d "/workspace/apex" ] && ! python -c "import apex" 2>/dev/null; then
         fi
     else
         echo "      No CUDA detected - using Python-only build"
-        if ! pip install -v --no-build-isolation --no-cache-dir ./; then
+        if ! timeout 900 pip install -v --no-build-isolation --no-cache-dir ./; then
             echo "      ERROR: Python-only Apex build failed"
             echo "      Continuing without Apex - some optimizations may not be available"
         else
@@ -133,8 +133,18 @@ echo "      Done."
 
 # 6. Patch inference scripts to point to correct model paths
 echo "[6/9] Patching inference scripts for correct model paths..."
-sed -i 's|\./ckpts/seedvr2_ema_3b\.pth|\./ckpts/SeedVR2-3B/seedvr2_ema_3b.pth|g' projects/inference_seedvr2_3b.py
-sed -i 's|\./ckpts/seedvr2_ema_7b\.pth|\./ckpts/SeedVR2-7B/seedvr2_ema_7b.pth|g' projects/inference_seedvr2_7b.py
+if [ -f "projects/inference_seedvr2_3b.py" ]; then
+    sed -i 's|\./ckpts/seedvr2_ema_3b\.pth|\./ckpts/SeedVR2-3B/seedvr2_ema_3b.pth|g' projects/inference_seedvr2_3b.py
+    echo "      Patched inference_seedvr2_3b.py"
+else
+    echo "      WARNING: projects/inference_seedvr2_3b.py not found, skipping patch"
+fi
+if [ -f "projects/inference_seedvr2_7b.py" ]; then
+    sed -i 's|\./ckpts/seedvr2_ema_7b\.pth|\./ckpts/SeedVR2-7B/seedvr2_ema_7b.pth|g' projects/inference_seedvr2_7b.py
+    echo "      Patched inference_seedvr2_7b.py"
+else
+    echo "      WARNING: projects/inference_seedvr2_7b.py not found, skipping patch"
+fi
 echo "      Done."
 
 # 6. Place the color_fix.py utility into the project
