@@ -52,10 +52,12 @@ if ! command -v nvcc &> /dev/null; then
     echo "DEBUG: nvcc not found, will install CUDA toolkit"
     echo "      Installing CUDA toolkit..."
     apt-get update
+    # Install minimal CUDA components to avoid dependency conflicts
     if wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
        dpkg -i cuda-keyring_1.0-1_all.deb && \
        apt-get update && \
-       apt-get install -y cuda-toolkit-12-1 && \
+       (apt-get install -y cuda-compiler-12-1 cuda-libraries-dev-12-1 cuda-driver-dev-12-1 || \
+        apt-get install -y --no-install-recommends cuda-toolkit-12-1-config-common cuda-compiler-12-1 cuda-libraries-dev-12-1) && \
        rm cuda-keyring_1.0-1_all.deb; then
         echo "      CUDA toolkit installed successfully"
         export CUDA_HOME=/usr/local/cuda
@@ -98,34 +100,33 @@ if [ -d "/workspace/apex" ] && ! python -c "import apex" 2>/dev/null; then
     cd /workspace/apex
     
     # Check if CUDA is available for compilation
-        if command -v nvcc &> /dev/null || [ -n "$CUDA_HOME" ]; then
-            echo "      CUDA detected - attempting CUDA build"
-            # Use environment variables to enable CUDA extensions as recommended by NVIDIA
-            if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
-                echo "      WARNING: CUDA Apex build failed - falling back to Python-only build"
-                # Try Python-only build as fallback
-                if ! pip install -v --no-build-isolation --no-cache-dir ./; then
-                    echo "      ERROR: Both CUDA and Python-only Apex builds failed"
-                    echo "      Continuing without Apex - some optimizations may not be available"
-                else
-                    echo "      Apex installed successfully (Python-only build)"
-                fi
-            else
-                echo "      Apex installed successfully with CUDA extensions"
-            fi
-        else
-            echo "      No CUDA detected - using Python-only build"
+    if command -v nvcc &> /dev/null || [ -n "$CUDA_HOME" ]; then
+        echo "      CUDA detected - attempting CUDA build"
+        # Use environment variables to enable CUDA extensions as recommended by NVIDIA
+        if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
+            echo "      WARNING: CUDA Apex build failed - falling back to Python-only build"
+            # Try Python-only build as fallback
             if ! pip install -v --no-build-isolation --no-cache-dir ./; then
-                echo "      ERROR: Python-only Apex build failed"
+                echo "      ERROR: Both CUDA and Python-only Apex builds failed"
                 echo "      Continuing without Apex - some optimizations may not be available"
             else
                 echo "      Apex installed successfully (Python-only build)"
             fi
+        else
+            echo "      Apex installed successfully with CUDA extensions"
         fi
-        
-        # Return to SeedVR directory
-        cd /workspace/SeedVR
+    else
+        echo "      No CUDA detected - using Python-only build"
+        if ! pip install -v --no-build-isolation --no-cache-dir ./; then
+            echo "      ERROR: Python-only Apex build failed"
+            echo "      Continuing without Apex - some optimizations may not be available"
+        else
+            echo "      Apex installed successfully (Python-only build)"
+        fi
     fi
+    
+    # Return to SeedVR directory
+    cd /workspace/SeedVR
 fi
 echo "DEBUG: CUDA/Apex installation section completed"
 echo "      Done."

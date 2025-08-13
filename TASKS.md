@@ -7,28 +7,28 @@
 **Progress**: 6/6 tasks completed
 
 ## Current Task
-**Task ID**: TASK-2025-01-13-005
-**Title**: Fix NVIDIA Apex Installation Logic Flaws
+**Task ID**: TASK-2025-01-13-006
+**Title**: Fix Bash Syntax Error and CUDA Dependency Conflicts
 **Status**: COMPLETE
-**Started**: 2025-01-13 22:15
-**Dependencies**: TASK-2025-01-13-004
+**Started**: 2025-01-13 23:45
+**Dependencies**: TASK-2025-01-13-005
 
 ### Task Context
 <!-- Critical information needed to resume this task -->
-- **Previous Work**: Identified two critical issues preventing APEX installation in containers
+- **Previous Work**: APEX installation logic fixed in TASK-2025-01-13-005, but runtime execution failing with bash syntax errors
 - **Key Files**: 
-  - `/opt/docker/SeedVR-RunPod/run.sh` (lines 10-12, 20, 31, 37, 74-120): Fixed step numbering and APEX logic
-  - Complete restructure of APEX installation logic with proper Python package detection
-- **Environment**: RunPod containers with persistent `/workspace/apex` directories causing installation bypass
-- **Next Steps**: Container rebuild required for fixes to take effect - GitHub Actions will build updated image
+  - `/opt/docker/SeedVR-RunPod/run.sh` (lines 96-129): Fixed improper nested if/fi structure causing syntax error
+  - Lines 51-67: Enhanced CUDA installation with minimal components to avoid dependency conflicts
+- **Environment**: Container execution failing due to bash syntax error at line 129 and CUDA toolkit dependency issues
+- **Next Steps**: Container rebuild and testing required - GitHub Actions will build updated image
 
 ### Findings & Decisions
-- **FINDING-001**: Container running outdated run.sh version (8-step vs 9-step numbering) without APEX installation
-- **DECISION-001**: Fix step numbering consistency throughout entire script → All steps now show consistent /9 numbering
-- **FINDING-002**: Critical APEX installation logic flaw - only checked directory existence, not package installation
-- **DECISION-002**: Implement proper Python package check first (`python -c "import apex"`) → Fixed installation bypass logic
-- **FINDING-003**: Directory existence check was causing complete installation skip even when APEX not installed
-- **DECISION-003**: Restructure logic to check package installation first, then handle directory/cloning appropriately → Robust installation flow
+- **FINDING-001**: Bash syntax error at line 129 - extra `fi` statement without matching `if` preventing container execution
+- **DECISION-001**: Restructure nested APEX installation if/fi logic with proper indentation and matching pairs → Fixed bash syntax compliance
+- **FINDING-002**: CUDA toolkit installation failing due to `nsight-systems-2023.1.2` dependency on unavailable `libtinfo5`
+- **DECISION-002**: Replace full CUDA toolkit with minimal components approach → Use `cuda-compiler-12-1 cuda-libraries-dev-12-1 cuda-driver-dev-12-1`
+- **FINDING-003**: Debug numbering verified as consistent - all steps properly numbered as `/9` format
+- **DECISION-003**: Maintain current numbering scheme → No changes needed to step numbering
 
 ### Task Chain
 1. ✅ Restore CUDA toolkit installation to run.sh runtime setup (TASK-2025-01-13-003a)
@@ -37,8 +37,10 @@
 4. ✅ Implement NVIDIA official recommendations for Apex compilation (TASK-2025-01-13-003d)
 5. ✅ Debug and fix step numbering inconsistency throughout run.sh script (TASK-2025-01-13-004a)
 6. ✅ Fix APEX installation logic flaw - proper Python package detection (TASK-2025-01-13-004b)
-7. ⏳ Container rebuild and deployment with fixed run.sh script (TASK-2025-01-13-006)
-8. ⏳ Verify APEX installation works correctly in updated container (TASK-2025-01-13-007)
+7. ✅ Fix bash syntax error in nested APEX installation logic (TASK-2025-01-13-006a)
+8. ✅ Resolve CUDA toolkit dependency conflicts with minimal components (TASK-2025-01-13-006b)
+9. ⏳ Container rebuild and deployment with fixed run.sh script (TASK-2025-01-13-007)
+10. ⏳ Verify APEX installation works correctly in updated container (TASK-2025-01-13-008)
 
 ## Upcoming Phases
 <!-- Future work not yet started -->

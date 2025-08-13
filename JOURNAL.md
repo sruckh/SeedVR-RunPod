@@ -1,5 +1,20 @@
 # Engineering Journal
 
+## 2025-01-13 23:45
+
+### Bash Syntax Error and CUDA Dependency Resolution |TASK:TASK-2025-01-13-006|
+- **What**: Fixed critical bash syntax error preventing container execution and resolved CUDA toolkit dependency conflicts
+- **Why**: Container execution failing with "line 129: syntax error near unexpected token 'fi'" and CUDA installation failing due to unresolvable dependencies
+- **How**: 
+  - **Issue #1**: Extra `fi` statement on line 128 without matching `if` - restructured nested APEX installation logic with proper indentation
+  - **Issue #2**: CUDA toolkit dependency conflicts with `nsight-systems-2023.1.2` requiring unavailable `libtinfo5` package
+  - Modified CUDA installation to use minimal components: `cuda-compiler-12-1 cuda-libraries-dev-12-1 cuda-driver-dev-12-1`
+  - Added fallback with `--no-install-recommends` to avoid problematic visual tools components
+- **Issues**: Improper bash structure and dependency resolution in container environment required careful component selection
+- **Result**: Fixed bash syntax compliance and robust CUDA installation strategy avoiding dependency conflicts while maintaining compilation capability
+
+---
+
 ## 2025-01-13 22:30
 
 ### Critical NVIDIA Apex Installation Logic Fix |TASK:TASK-2025-01-13-005|
