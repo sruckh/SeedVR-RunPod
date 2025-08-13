@@ -164,6 +164,8 @@ echo "      Done."
 echo "[9/9] Launching Gradio interface..."
 # The script is copied into /workspace by the Dockerfile
 # It will be served on port 7860 as configured in app.py
+# Make sure we're in the SeedVR directory where projects/ folder exists
+cd /workspace/SeedVR
 python /workspace/app.py
 
 echo "--- SeedVR Setup and Launch Complete ---"

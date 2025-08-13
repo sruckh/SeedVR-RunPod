@@ -7,28 +7,28 @@
 **Progress**: 6/6 tasks completed
 
 ## Current Task
-**Task ID**: TASK-2025-01-13-007
-**Title**: Fix APEX Installation Timeout and Missing Inference Files
+**Task ID**: TASK-2025-01-13-008
+**Title**: Fix Inference Script Working Directory Issue
 **Status**: COMPLETE
-**Started**: 2025-01-13 23:55
-**Dependencies**: TASK-2025-01-13-006
+**Started**: 2025-08-13 00:05
+**Dependencies**: TASK-2025-01-13-007
 
 ### Task Context
 <!-- Critical information needed to resume this task -->
-- **Previous Work**: Bash syntax errors fixed in TASK-2025-01-13-006, but infinite APEX installation loops and missing inference files
+- **Previous Work**: APEX timeout and file existence fixes completed in TASK-2025-01-13-007, but inference scripts failing to load
 - **Key Files**: 
-  - `/opt/docker/SeedVR-RunPod/run.sh` (lines 106-109): Added timeout commands to prevent infinite APEX installation hanging
-  - Lines 136-147: Added file existence checks before sed operations on inference scripts
-- **Environment**: Container executing successfully but hanging during APEX compilation and failing on missing inference files
+  - `/opt/docker/SeedVR-RunPod/run.sh` (line 168): Added `cd /workspace/SeedVR` before launching Gradio app
+  - `/opt/docker/SeedVR-RunPod/app.py` expects relative paths from SeedVR directory
+- **Environment**: Container startup complete but inference failing due to wrong working directory when launching Gradio app
 - **Next Steps**: Container rebuild and testing required - GitHub Actions will build updated image
 
 ### Findings & Decisions
-- **FINDING-001**: APEX installation hanging indefinitely during CUDA compilation, causing infinite loops
-- **DECISION-001**: Add timeout commands to prevent infinite hanging → CUDA build: 1800s timeout, Python-only fallback: 900s timeout
-- **FINDING-002**: Missing inference script files causing sed command failures: `projects/inference_seedvr2_3b.py` and `projects/inference_seedvr2_7b.py`
-- **DECISION-002**: Add file existence checks before sed operations → Skip patching with warning if files don't exist
-- **FINDING-003**: Container now executes without syntax errors and continues startup even with missing files
-- **DECISION-003**: Maintain graceful degradation approach → Container continues to function with warnings instead of failures
+- **FINDING-001**: Gradio app failing to find inference scripts: `projects/inference_seedvr2_3b.py` not found
+- **DECISION-001**: Fix working directory issue → Add `cd /workspace/SeedVR` before launching Gradio app
+- **FINDING-002**: `app.py` comment indicates it expects to run from `/workspace/SeedVR` directory but was launched from `/workspace`
+- **DECISION-002**: Ensure correct working directory → Change to SeedVR directory where `projects/` folder exists before executing app
+- **FINDING-003**: ByteDance SeedVR repository confirms inference scripts are in `projects/` directory relative to repo root
+- **DECISION-003**: Maintain existing relative paths in app.py → Fix execution context rather than modifying application logic
 ### Task Chain
 1. ✅ Restore CUDA toolkit installation to run.sh runtime setup (TASK-2025-01-13-003a)
 2. ✅ Enhanced Apex compilation with CUDA detection and fallback (TASK-2025-01-13-003b)
@@ -40,8 +40,9 @@
 8. ✅ Resolve CUDA toolkit dependency conflicts with minimal components (TASK-2025-01-13-006b)
 9. ✅ Add timeout commands to prevent infinite APEX installation hanging (TASK-2025-01-13-007a)
 10. ✅ Add file existence checks for inference script patching (TASK-2025-01-13-007b)
-11. ⏳ Container rebuild and deployment with all fixes (TASK-2025-01-13-008)
-12. ⏳ Verify complete container workflow execution (TASK-2025-01-13-009)
+11. ✅ Fix working directory for Gradio app launch to access inference scripts (TASK-2025-01-13-008a)
+12. ⏳ Container rebuild and deployment with working directory fix (TASK-2025-01-13-009)
+13. ⏳ Verify inference functionality works end-to-end (TASK-2025-01-13-010)
 
 ## Upcoming Phases
 <!-- Future work not yet started -->

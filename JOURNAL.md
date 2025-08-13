@@ -1,5 +1,19 @@
 # Engineering Journal
 
+## 2025-08-13 00:05
+
+### Inference Script Working Directory Fix |TASK:TASK-2025-01-13-008|
+- **What**: Fixed Gradio app failing to find inference scripts due to wrong working directory
+- **Why**: Container startup completed successfully, but inference failing with "Inference script not found at projects/inference_seedvr2_3b.py"
+- **How**: 
+  - **Root Cause**: `app.py` expects to run from `/workspace/SeedVR` directory (as noted in comment) but was being executed from `/workspace`
+  - **Solution**: Added `cd /workspace/SeedVR` in `run.sh` before launching Gradio app (line 168)
+  - **Verification**: ByteDance SeedVR repository confirms inference scripts are in `projects/` directory relative to repo root
+- **Issues**: Working directory mismatch prevented relative path resolution to inference scripts
+- **Result**: Gradio app now launches from correct directory where `projects/inference_seedvr2_3b.py` and `projects/inference_seedvr2_7b.py` are accessible
+
+---
+
 ## 2025-01-13 23:55
 
 ### APEX Installation Timeout and Missing File Fixes |TASK:TASK-2025-01-13-007|
