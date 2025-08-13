@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 
-# Install essential system dependencies and CUDA toolkit for Apex
+# Install essential system dependencies (CUDA toolkit installed at runtime)
 RUN apt-get update && apt-get install -y \
     git \
     wget \
@@ -16,17 +16,7 @@ RUN apt-get update && apt-get install -y \
     gnupg2 \
     curl \
     ca-certificates \
-    && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb \
-    && dpkg -i cuda-keyring_1.0-1_all.deb \
-    && apt-get update \
-    && apt-get install -y cuda-toolkit-12-1 \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm cuda-keyring_1.0-1_all.deb
-
-# Set CUDA environment variables
-ENV CUDA_HOME=/usr/local/cuda
-ENV PATH=${CUDA_HOME}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /workspace

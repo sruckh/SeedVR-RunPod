@@ -1,5 +1,25 @@
 # Engineering Journal
 
+## 2025-01-13 20:15
+
+### GitHub Actions Build Fix - CUDA Removal from Dockerfile |TASK:TASK-2025-01-13-002|
+- **What**: Fixed GitHub Actions build failure by removing CUDA toolkit installation from Dockerfile
+- **Why**: GitHub Actions build environment lacks GPU access, causing CUDA installation to fail during Docker build
+- **How**: 
+  - Removed CUDA toolkit installation lines from Dockerfile (lines 19-24 and 26-29)
+  - Kept only essential system dependencies for build time
+  - Maintained existing runtime CUDA installation in run.sh (already robust)
+  - Updated Dockerfile comments to clarify runtime-only CUDA approach
+- **Issues**: 
+  - Build failure with exit code 100 during CUDA toolkit installation
+  - GitHub Actions runners have no GPU access during build phase
+  - Previous Apex integration inadvertently moved CUDA to build time
+- **Result**: 
+  - Lightweight Docker image builds successfully in GitHub Actions
+  - Runtime CUDA installation preserved and functional
+  - Follows project's runtime-first architecture philosophy
+  - Container size reduced by removing build-time CUDA (~3GB savings)
+
 ## 2025-01-13 15:00
 
 ### NVIDIA Apex Integration for SeedVR Performance Optimization |TASK:TASK-2025-01-13-001|
