@@ -41,27 +41,60 @@ echo "      Installing Gradio..."
 pip install gradio
 echo "      Done."
 
+# 4.5. Clone and build NVIDIA Apex
+echo "[4.5/9] Building and installing NVIDIA Apex..."
+if [ -d "/workspace/apex" ]; then
+    echo "      Apex repository already exists. Skipping clone."
+else
+    echo "      Cloning NVIDIA Apex repository..."
+    if ! git clone https://github.com/NVIDIA/apex.git /workspace/apex; then
+        echo "      ERROR: Failed to clone NVIDIA Apex repository"
+        echo "      Continuing without Apex - some optimizations may not be available"
+        # Don't exit, continue with the rest of setup
+    else
+        cd /workspace/apex
+        echo "      Building Apex with CUDA extensions (this may take several minutes)..."
+        # Use environment variables to enable CUDA extensions as recommended by NVIDIA
+        if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
+            echo "      WARNING: Apex installation failed - falling back to Python-only build"
+            # Try Python-only build as fallback
+            if ! pip install -v --no-build-isolation --no-cache-dir ./; then
+                echo "      ERROR: Both CUDA and Python-only Apex builds failed"
+                echo "      Continuing without Apex - some optimizations may not be available"
+            else
+                echo "      Apex installed successfully (Python-only build)"
+            fi
+        else
+            echo "      Apex installed successfully with CUDA extensions"
+        fi
+        
+        # Return to SeedVR directory
+        cd /workspace/SeedVR
+    fi
+fi
+echo "      Done."
+
 # 5. Patch inference scripts to point to correct model paths
-echo "[5/8] Patching inference scripts for correct model paths..."
+echo "[5/9] Patching inference scripts for correct model paths..."
 sed -i 's|\./ckpts/seedvr2_ema_3b\.pth|\./ckpts/SeedVR2-3B/seedvr2_ema_3b.pth|g' projects/inference_seedvr2_3b.py
 sed -i 's|\./ckpts/seedvr2_ema_7b\.pth|\./ckpts/SeedVR2-7B/seedvr2_ema_7b.pth|g' projects/inference_seedvr2_7b.py
 echo "      Done."
 
 # 6. Place the color_fix.py utility into the project
-echo "[6/8] Placing color_fix.py utility..."
+echo "[6/9] Placing color_fix.py utility..."
 # The file is copied into /workspace by the Dockerfile
 mkdir -p ./projects/video_diffusion_sr/
 cp /workspace/color_fix.py ./projects/video_diffusion_sr/color_fix.py
 echo "      Done."
 
 # 7. Run the model download script
-echo "[7/8] Downloading AI models (this may take a while)..."
+echo "[7/9] Downloading AI models (this may take a while)..."
 # The script is copied into /workspace by the Dockerfile
 python /workspace/download.py
 echo "      Done."
 
 # 8. Launch the Gradio web interface
-echo "[8/8] Launching Gradio interface..."
+echo "[9/9] Launching Gradio interface..."
 # The script is copied into /workspace by the Dockerfile
 # It will be served on port 7860 as configured in app.py
 python /workspace/app.py
