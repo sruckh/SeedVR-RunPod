@@ -1,5 +1,26 @@
 # Engineering Journal
 
+## 2025-01-13 20:45
+
+### Critical Fix: Apex CUDA Compilation Restored |TASK:TASK-2025-01-13-003|
+- **What**: Fixed broken Apex compilation by restoring CUDA toolkit installation to runtime setup
+- **Why**: SeedVR requires NVIDIA Apex for inference - previous Dockerfile fix inadvertently broke Apex compilation
+- **How**: 
+  - Added CUDA toolkit installation back to run.sh runtime setup (lines 47-66)
+  - Enhanced Apex compilation with comprehensive CUDA detection (lines 81-105)
+  - Implemented official NVIDIA recommendations: APEX_CPP_EXT=1 APEX_CUDA_EXT=1
+  - Added robust fallback to Python-only build if CUDA compilation fails
+- **Issues**: 
+  - Apex compilation was completely broken after removing CUDA from Dockerfile
+  - SeedVR inference depends on Apex for performance optimizations
+  - Must balance GitHub Actions build success with runtime functionality
+- **Result**: 
+  - CUDA toolkit installs at runtime when GPU is available
+  - Apex compiles with CUDA extensions for optimal performance
+  - Graceful fallback to Python-only Apex if CUDA unavailable
+  - Container now fully functional for SeedVR inference workloads
+  - Maintains lightweight Docker build while ensuring runtime functionality
+
 ## 2025-01-13 20:15
 
 ### GitHub Actions Build Fix - CUDA Removal from Dockerfile |TASK:TASK-2025-01-13-002|
