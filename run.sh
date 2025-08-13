@@ -157,6 +157,8 @@ echo "      Done."
 # 7. Run the model download script
 echo "[8/9] Downloading AI models (this may take a while)..."
 # The script is copied into /workspace by the Dockerfile
+# Make sure we're in the SeedVR directory so models download to ./ckpts
+cd /workspace/SeedVR
 python /workspace/download.py
 echo "      Done."
 
