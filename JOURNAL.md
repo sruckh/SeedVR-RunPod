@@ -1,5 +1,19 @@
 # Engineering Journal
 
+## 2025-01-13 22:15
+
+### NVIDIA Apex Installation Debugging Implementation |TASK:TASK-2025-01-13-004|
+- **What**: Added comprehensive debugging to diagnose why CUDA/Apex installation step is being skipped during container execution
+- **Why**: User reported APEX installation not occurring despite step 4.5 being present in run.sh - execution showed only 8 steps instead of 9
+- **How**: 
+  - Fixed step numbering inconsistency: Changed [4/8] to [4/9] and renumbered all subsequent steps for consistency
+  - Added DEBUG markers at critical decision points: nvcc detection, directory checks, Apex cloning, section completion
+  - Enhanced execution flow tracking with "DEBUG: About to start CUDA/Apex installation step" and similar markers
+- **Issues**: Step numbering inconsistency (4/8→4.5/9→5/9) suggested script execution path problems
+- **Result**: Enhanced run.sh with debugging output to identify where execution diverges from expected flow
+
+---
+
 ## 2025-01-13 20:45
 
 ### Critical Fix: Apex CUDA Compilation Restored |TASK:TASK-2025-01-13-003|

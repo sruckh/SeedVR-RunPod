@@ -34,18 +34,22 @@ pip install -r requirements.txt
 echo "      Done."
 
 # 4. Install the specific flash-attention wheel
-echo "[4/8] Installing flash-attention wheel..."
+echo "[4/9] Installing flash-attention wheel..."
 pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.9.post1/flash_attn-2.5.9.post1+cu122torch2.3cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
 echo "      Installing Gradio..."
 pip install gradio
 echo "      Done."
 
-# 4.5. Install CUDA toolkit and build NVIDIA Apex
-echo "[4.5/9] Installing CUDA toolkit and building NVIDIA Apex..."
+# 5. Install CUDA toolkit and build NVIDIA Apex
+echo "DEBUG: About to start CUDA/Apex installation step"
+echo "[5/9] Installing CUDA toolkit and building NVIDIA Apex..."
+echo "DEBUG: Starting CUDA/Apex installation section"
 
 # First, install CUDA toolkit if not already present
+echo "DEBUG: Checking for nvcc command..."
 if ! command -v nvcc &> /dev/null; then
+    echo "DEBUG: nvcc not found, will install CUDA toolkit"
     echo "      Installing CUDA toolkit..."
     apt-get update
     if wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
@@ -62,13 +66,17 @@ if ! command -v nvcc &> /dev/null; then
         echo "      Continuing with host CUDA (if available) or Python-only Apex build"
     fi
 else
+    echo "DEBUG: nvcc found, CUDA toolkit already available"
     echo "      CUDA toolkit already available"
 fi
 
 # Now build Apex
+echo "DEBUG: Checking if /workspace/apex directory exists..."
 if [ -d "/workspace/apex" ]; then
+    echo "DEBUG: /workspace/apex exists, skipping clone"
     echo "      Apex repository already exists. Skipping clone."
 else
+    echo "DEBUG: /workspace/apex does not exist, will clone"
     echo "      Cloning NVIDIA Apex repository..."
     if ! git clone https://github.com/NVIDIA/apex.git /workspace/apex; then
         echo "      ERROR: Failed to clone NVIDIA Apex repository"
@@ -108,23 +116,24 @@ else
         cd /workspace/SeedVR
     fi
 fi
+echo "DEBUG: CUDA/Apex installation section completed"
 echo "      Done."
 
-# 5. Patch inference scripts to point to correct model paths
-echo "[5/9] Patching inference scripts for correct model paths..."
+# 6. Patch inference scripts to point to correct model paths
+echo "[6/9] Patching inference scripts for correct model paths..."
 sed -i 's|\./ckpts/seedvr2_ema_3b\.pth|\./ckpts/SeedVR2-3B/seedvr2_ema_3b.pth|g' projects/inference_seedvr2_3b.py
 sed -i 's|\./ckpts/seedvr2_ema_7b\.pth|\./ckpts/SeedVR2-7B/seedvr2_ema_7b.pth|g' projects/inference_seedvr2_7b.py
 echo "      Done."
 
 # 6. Place the color_fix.py utility into the project
-echo "[6/9] Placing color_fix.py utility..."
+echo "[7/9] Placing color_fix.py utility..."
 # The file is copied into /workspace by the Dockerfile
 mkdir -p ./projects/video_diffusion_sr/
 cp /workspace/color_fix.py ./projects/video_diffusion_sr/color_fix.py
 echo "      Done."
 
 # 7. Run the model download script
-echo "[7/9] Downloading AI models (this may take a while)..."
+echo "[8/9] Downloading AI models (this may take a while)..."
 # The script is copied into /workspace by the Dockerfile
 python /workspace/download.py
 echo "      Done."
