@@ -41,8 +41,30 @@ echo "      Installing Gradio..."
 pip install gradio
 echo "      Done."
 
-# 4.5. Clone and build NVIDIA Apex
-echo "[4.5/9] Building and installing NVIDIA Apex..."
+# 4.5. Install CUDA toolkit and build NVIDIA Apex
+echo "[4.5/9] Installing CUDA toolkit and building NVIDIA Apex..."
+
+# First, install CUDA toolkit if not already present
+if ! command -v nvcc &> /dev/null; then
+    echo "      Installing CUDA toolkit..."
+    if wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
+       dpkg -i cuda-keyring_1.0-1_all.deb && \
+       apt-get update && \
+       apt-get install -y cuda-toolkit-12-1 && \
+       rm cuda-keyring_1.0-1_all.deb; then
+        echo "      CUDA toolkit installed successfully"
+        export CUDA_HOME=/usr/local/cuda
+        export PATH=${CUDA_HOME}/bin:${PATH}
+        export LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+    else
+        echo "      WARNING: CUDA toolkit installation failed"
+        echo "      Continuing with host CUDA (if available) or Python-only Apex build"
+    fi
+else
+    echo "      CUDA toolkit already available"
+fi
+
+# Now build Apex
 if [ -d "/workspace/apex" ]; then
     echo "      Apex repository already exists. Skipping clone."
 else
@@ -54,18 +76,31 @@ else
     else
         cd /workspace/apex
         echo "      Building Apex with CUDA extensions (this may take several minutes)..."
-        # Use environment variables to enable CUDA extensions as recommended by NVIDIA
-        if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
-            echo "      WARNING: Apex installation failed - falling back to Python-only build"
-            # Try Python-only build as fallback
+        
+        # Check if CUDA is available for compilation
+        if command -v nvcc &> /dev/null || [ -n "$CUDA_HOME" ]; then
+            echo "      CUDA detected - attempting CUDA build"
+            # Use environment variables to enable CUDA extensions as recommended by NVIDIA
+            if ! APEX_CPP_EXT=1 APEX_CUDA_EXT=1 pip install -v --no-build-isolation --no-cache-dir ./; then
+                echo "      WARNING: CUDA Apex build failed - falling back to Python-only build"
+                # Try Python-only build as fallback
+                if ! pip install -v --no-build-isolation --no-cache-dir ./; then
+                    echo "      ERROR: Both CUDA and Python-only Apex builds failed"
+                    echo "      Continuing without Apex - some optimizations may not be available"
+                else
+                    echo "      Apex installed successfully (Python-only build)"
+                fi
+            else
+                echo "      Apex installed successfully with CUDA extensions"
+            fi
+        else
+            echo "      No CUDA detected - using Python-only build"
             if ! pip install -v --no-build-isolation --no-cache-dir ./; then
-                echo "      ERROR: Both CUDA and Python-only Apex builds failed"
+                echo "      ERROR: Python-only Apex build failed"
                 echo "      Continuing without Apex - some optimizations may not be available"
             else
                 echo "      Apex installed successfully (Python-only build)"
             fi
-        else
-            echo "      Apex installed successfully with CUDA extensions"
         fi
         
         # Return to SeedVR directory
