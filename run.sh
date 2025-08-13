@@ -7,9 +7,9 @@ echo "--- Starting SeedVR Runtime Setup ---"
 
 # 1. Clone SeedVR repository
 if [ -d "/workspace/SeedVR" ]; then
-    echo "[1/8] SeedVR repository already exists. Skipping clone."
+    echo "[1/9] SeedVR repository already exists. Skipping clone."
 else
-    echo "[1/8] Cloning SeedVR repository..."
+    echo "[1/9] Cloning SeedVR repository..."
     git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
 fi
 cd /workspace/SeedVR
@@ -17,7 +17,7 @@ echo "      Done."
 
 
 # 2. Create and activate Python virtual environment
-echo "[2/8] Setting up Python virtual environment..."
+echo "[2/9] Setting up Python virtual environment..."
 if [ -d "venv" ]; then
     echo "      Virtual environment already exists. Activating."
 else
@@ -28,7 +28,7 @@ export PYTHONPATH="/workspace/SeedVR:$PYTHONPATH"
 echo "      Done."
 
 # 3. Install Python dependencies from the cloned repo
-echo "[3/8] Installing dependencies from requirements.txt..."
+echo "[3/9] Installing dependencies from requirements.txt..."
 pip install --upgrade pip
 pip install -r requirements.txt
 echo "      Done."
@@ -71,22 +71,33 @@ else
 fi
 
 # Now build Apex
-echo "DEBUG: Checking if /workspace/apex directory exists..."
-if [ -d "/workspace/apex" ]; then
-    echo "DEBUG: /workspace/apex exists, skipping clone"
-    echo "      Apex repository already exists. Skipping clone."
+echo "DEBUG: Checking if NVIDIA Apex is already installed..."
+if python -c "import apex" 2>/dev/null; then
+    echo "DEBUG: NVIDIA Apex already installed, skipping entire installation"
+    echo "      NVIDIA Apex already installed. Skipping."
+elif [ -d "/workspace/apex" ]; then
+    echo "DEBUG: /workspace/apex exists but Apex not installed, will build from existing repo"
+    echo "      Apex repository exists. Building from existing source..."
+    cd /workspace/apex
+    echo "      Building Apex with CUDA extensions (this may take several minutes)..."
 else
-    echo "DEBUG: /workspace/apex does not exist, will clone"
+    echo "DEBUG: /workspace/apex does not exist and Apex not installed, will clone and build"
     echo "      Cloning NVIDIA Apex repository..."
     if ! git clone https://github.com/NVIDIA/apex.git /workspace/apex; then
         echo "      ERROR: Failed to clone NVIDIA Apex repository"
         echo "      Continuing without Apex - some optimizations may not be available"
-        # Don't exit, continue with the rest of setup
     else
         cd /workspace/apex
         echo "      Building Apex with CUDA extensions (this may take several minutes)..."
-        
-        # Check if CUDA is available for compilation
+    fi
+fi
+
+# If we have the apex directory (either existing or newly cloned), proceed with installation
+if [ -d "/workspace/apex" ] && ! python -c "import apex" 2>/dev/null; then
+    echo "DEBUG: Proceeding with Apex installation from /workspace/apex"
+    cd /workspace/apex
+    
+    # Check if CUDA is available for compilation
         if command -v nvcc &> /dev/null || [ -n "$CUDA_HOME" ]; then
             echo "      CUDA detected - attempting CUDA build"
             # Use environment variables to enable CUDA extensions as recommended by NVIDIA

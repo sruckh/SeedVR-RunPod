@@ -1,5 +1,19 @@
 # Engineering Journal
 
+## 2025-01-13 22:30
+
+### Critical NVIDIA Apex Installation Logic Fix |TASK:TASK-2025-01-13-005|
+- **What**: Identified and fixed two critical issues preventing NVIDIA Apex installation in RunPod containers
+- **Why**: User reported APEX not installing despite code being present - root cause analysis revealed fundamental logic flaws
+- **How**: 
+  - **Issue #1**: Step numbering inconsistency (mixed /8 and /9) causing execution confusion - fixed all steps to consistent /9 numbering
+  - **Issue #2**: APEX installation logic only checked directory existence, not package installation - added proper `python -c "import apex"` check first
+  - Restructured installation flow: check package → handle existing directory → clone if needed → install with CUDA/fallback
+- **Issues**: Logic flaw allowed containers with persistent `/workspace/apex` directories to completely bypass APEX installation
+- **Result**: Robust installation logic that verifies actual package installation, not just directory presence
+
+---
+
 ## 2025-01-13 22:15
 
 ### NVIDIA Apex Installation Debugging Implementation |TASK:TASK-2025-01-13-004|
