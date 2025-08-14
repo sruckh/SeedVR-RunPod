@@ -7,29 +7,28 @@
 **Progress**: 6/6 tasks completed
 
 ## Current Task
-**Task ID**: TASK-2025-08-13-001
-**Title**: APEX Virtual Environment and Color Fix Resolution
+**Task ID**: TASK-2025-08-14-001
+**Title**: VAE Model Path Absolute Path Conversion
 **Status**: COMPLETE
-**Started**: 2025-08-13 23:00
-**Dependencies**: TASK-2025-01-13-008
+**Started**: 2025-08-14 06:30
+**Dependencies**: TASK-2025-08-13-001
 
 ### Task Context
 <!-- Critical information needed to resume this task -->
-- **Previous Work**: Working directory fixes completed, but APEX virtual environment isolation and color_fix.py placement issues discovered during runtime
+- **Previous Work**: APEX and color fix issues resolved, but runtime error showing VAE model not found at `./ckpts/ema_vae.pth`
 - **Key Files**: 
-  - `/opt/docker/SeedVR-RunPod/run.sh` (lines 49-287): Enhanced APEX installation with virtual environment fixes and color_fix.py verification
-  - `/workspace/SeedVR/apex_fallback.py`: Created fallback implementation for missing APEX
-  - Color fix placement with verification at `./projects/video_diffusion_sr/color_fix.py`
-- **Environment**: Container runtime errors: `ModuleNotFoundError: No module named 'apex'` and "Color fix is not available" resolved
-- **Next Steps**: Container rebuild required to test comprehensive APEX and color fix solutions
+  - `/opt/docker/SeedVR-RunPod/run.sh` (lines 85, 91, 100, 106-108): Updated all model path patches to use absolute paths
+  - Model locations confirmed at `/workspace/SeedVR/ckpts/SeedVR2-3B/ema_vae.pth` and `/workspace/SeedVR/ckpts/SeedVR2-7B/ema_vae.pth`
+- **Environment**: Container failing with `FileNotFoundError: [Errno 2] No such file or directory: './ckpts/ema_vae.pth'`
+- **Next Steps**: Container rebuild to test VAE model path fixes
 
 ### Findings & Decisions
-- **FINDING-001**: APEX installed globally but inference runs in virtual environment `/workspace/SeedVR/venv` → `ModuleNotFoundError: No module named 'apex'`
-- **DECISION-001**: Fix virtual environment isolation → Use explicit `/workspace/SeedVR/venv/bin/python` and `/workspace/SeedVR/venv/bin/pip` paths
-- **FINDING-002**: "Color fix is not available" error despite correct placement at `./projects/video_diffusion_sr/color_fix.py`
-- **DECISION-002**: Enhanced color fix placement → Add verification and debugging to ensure file exists and is accessible
-- **FINDING-003**: APEX installation verification needed in actual execution environment
-- **DECISION-003**: Comprehensive fallback strategy → Create PyTorch-based FusedRMSNorm replacement when APEX unavailable
+- **FINDING-001**: Third iteration of same issue - relative path patches not working consistently
+- **DECISION-001**: Convert all model paths to absolute paths → Ensures reliable file access regardless of working directory
+- **FINDING-002**: Both 3B and 7B models have separate VAE files that need different paths
+- **DECISION-002**: Implement dual VAE patching → 3B files use `/workspace/SeedVR/ckpts/SeedVR2-3B/ema_vae.pth`, 7B files use `/workspace/SeedVR/ckpts/SeedVR2-7B/ema_vae.pth`
+- **FINDING-003**: Inconsistent patching approach between main model files and VAE files
+- **DECISION-003**: Standardize all patches to absolute paths → Eliminates working directory dependency issues
 ### Task Chain
 1. ✅ Restore CUDA toolkit installation to run.sh runtime setup (TASK-2025-01-13-003a)
 2. ✅ Enhanced Apex compilation with CUDA detection and fallback (TASK-2025-01-13-003b)
