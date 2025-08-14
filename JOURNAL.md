@@ -1,5 +1,38 @@
 # Engineering Journal
 
+## 2025-08-13 23:00
+
+### APEX Virtual Environment Fix and Color Fix Enhancement |TASK:TASK-2025-08-13-001|
+- **What**: Resolved critical APEX virtual environment isolation issue and enhanced color_fix.py placement with verification
+- **Why**: Runtime errors showed `ModuleNotFoundError: No module named 'apex'` and "Color fix is not available" despite successful container setup logs
+- **How**: 
+  - **APEX Issue**: Root cause was APEX installing in global Python but inference running in `/workspace/SeedVR/venv`
+  - **Virtual Environment Fix**: Changed all APEX installation to use explicit virtual environment paths:
+    - `/workspace/SeedVR/venv/bin/python` for all Python operations
+    - `/workspace/SeedVR/venv/bin/pip` for all package installations
+    - Re-activated virtual environment before APEX installation section
+  - **APEX Fallback**: Created comprehensive fallback system (`/workspace/SeedVR/apex_fallback.py`):
+    - PyTorch-based `FusedRMSNorm` implementation with identical API to NVIDIA Apex
+    - Automatic module injection into `sys.modules` when APEX import fails
+    - Maintains performance optimizations with native PyTorch operations
+  - **Color Fix Enhancement**: Added verification and debugging for proper placement:
+    - Explicit directory navigation to `/workspace/SeedVR`
+    - Source file existence check for `/workspace/color_fix.py`
+    - Copy operation verification with `ls -la` output for debugging
+    - Clear success/error indicators (✅/❌) for troubleshooting
+- **Issues**: 
+  - Virtual environment activation not persisting across script sections
+  - Color fix placement had no verification, making failures silent
+  - No fallback mechanism when APEX installation fails
+- **Result**: 
+  - APEX now installs in correct virtual environment where inference executes
+  - Robust fallback ensures inference works whether APEX installation succeeds or fails
+  - Color fix placement has comprehensive verification and error reporting
+  - Updated container steps from 9 to 10 with proper numbering throughout
+  - Enhanced debugging output for diagnosing installation issues
+
+---
+
 ## 2025-08-13 00:05
 
 ### Inference Script Working Directory Fix |TASK:TASK-2025-01-13-008|
