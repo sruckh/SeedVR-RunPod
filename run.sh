@@ -62,10 +62,19 @@ pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0
 
 # Verify APEX installation
 echo "DEBUG: Verifying APEX installation in virtual environment..."
-if python -c "import apex; print(f'APEX version: {apex.__version__}'); from apex.normalization import FusedRMSNorm; print('FusedRMSNorm import successful')" 2>/dev/null; then
-    echo "      ✅ APEX successfully installed and verified from pre-built wheel"
+echo "DEBUG: Testing basic apex import..."
+if python -c "import apex; print(f'APEX version: {apex.__version__}')" 2>&1; then
+    echo "      ✅ Basic APEX import successful"
+    echo "DEBUG: Testing FusedRMSNorm import..."
+    if python -c "from apex.normalization import FusedRMSNorm; print('FusedRMSNorm import successful')" 2>&1; then
+        echo "      ✅ APEX successfully installed and verified from pre-built wheel"
+    else
+        echo "      ⚠️  FusedRMSNorm import failed - checking what's available in apex.normalization..."
+        python -c "import apex.normalization; print('Available in apex.normalization:', dir(apex.normalization))" 2>&1 || echo "apex.normalization module not found"
+    fi
 else
-    echo "      ⚠️  APEX wheel installation failed - falling back to PyTorch native operations"
+    echo "      ⚠️  Basic APEX import failed"
+    python -c "import apex" 2>&1 || echo "APEX import error details shown above"
 fi
 
 echo "      Done."
@@ -84,6 +93,11 @@ if [ -f "projects/inference_seedvr2_7b.py" ]; then
 else
     echo "      WARNING: projects/inference_seedvr2_7b.py not found, skipping patch"
 fi
+
+# Fix VAE model paths (found in both 3B and 7B model directories)
+echo "      Patching VAE model paths..."
+find projects -name "*.py" -exec sed -i 's|\./ckpts/ema_vae\.pth|\./ckpts/SeedVR2-3B/ema_vae.pth|g' {} \; 2>/dev/null || true
+echo "      Patched VAE model paths to use SeedVR2-3B directory"
 echo "      Done."
 
 # 7. Place the color_fix.py utility into the project
