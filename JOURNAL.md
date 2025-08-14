@@ -1,5 +1,24 @@
 # Engineering Journal
 
+## 2025-08-14 18:52
+
+### VAE Path Definitive Architectural Solution |TASK:TASK-2025-08-14-003|
+- **What**: Implemented definitive architectural solution for recurring VAE model path error
+- **Why**: After 4 failed attempts with sed patches, needed systematic approach addressing root cause
+- **How**: Modified download.py to copy shared ema_vae.pth file to expected location, removed sed patches from run.sh
+- **Issues**: Serena symbol matching had difficulties with complex multi-line replacements
+- **Result**: Clean architectural fix - VAE file now at ./ckpts/ema_vae.pth where code expects it, eliminates FileNotFoundError
+
+### Key Insights from VAE Path Resolution
+- **Architectural Thinking**: Fixed file structure to match code expectations rather than patching code
+- **Shared Resource Recognition**: User insight that ema_vae.pth is identical between 3B/7B models
+- **Clean Solution**: Single copy operation at download time vs complex runtime patching
+- **Prevention**: Documented complete analysis in .serena/memories/ for future reference
+
+---
+
+## 2025-08-13 23:00# Engineering Journal
+
 ## 2025-08-13 23:00
 
 ### APEX Virtual Environment Fix and Color Fix Enhancement |TASK:TASK-2025-08-13-001|
