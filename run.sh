@@ -94,19 +94,8 @@ else
     echo "      WARNING: projects/inference_seedvr2_7b.py not found, skipping patch"
 fi
 
-# Fix VAE model paths in the specific infer.py file where the error occurs
-echo "      Patching VAE model paths..."
-if [ -f "projects/video_diffusion_sr/infer.py" ]; then
-    sed -i 's|\./ckpts/ema_vae\.pth|/workspace/SeedVR/ckpts/SeedVR2-3B/ema_vae.pth|g' projects/video_diffusion_sr/infer.py
-    echo "      Patched VAE model path in video_diffusion_sr/infer.py"
-else
-    echo "      WARNING: projects/video_diffusion_sr/infer.py not found"
-fi
-# Also patch any other Python files that might reference VAE models
-find projects -name "*.py" -exec sed -i 's|\./ckpts/ema_vae\.pth|/workspace/SeedVR/ckpts/SeedVR2-3B/ema_vae.pth|g' {} \; 2>/dev/null || true
-# Check for any 7B model references that might need the 7B VAE path
-find projects -name "*7b*" -name "*.py" -exec sed -i 's|/workspace/SeedVR/ckpts/SeedVR2-3B/ema_vae\.pth|/workspace/SeedVR/ckpts/SeedVR2-7B/ema_vae.pth|g' {} \; 2>/dev/null || true
-echo "      Patched all VAE model paths to use absolute path (3B and 7B variants)"
+# VAE model paths handled by download.py - no code patching needed
+echo "      VAE model paths handled in download process..."
 echo "      Done."
 
 # 7. Place the color_fix.py utility into the project
