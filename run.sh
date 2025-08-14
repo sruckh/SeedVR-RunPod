@@ -56,15 +56,7 @@ echo "      Python executable: $(which python)"
 echo "      Pip executable: $(which pip)"
 echo "      Python version: $(python --version)"
 
-# Install CUDA toolkit (required for APEX even from wheel)
-echo "      Installing CUDA toolkit..."
-apt-get update -qq
-apt-get install -y --no-install-recommends \
-    cuda-compiler-12-1 \
-    cuda-libraries-dev-12-1 \
-    cuda-driver-dev-12-1
-
-# Install APEX from ByteDance pre-built wheel
+# Install APEX from ByteDance pre-built wheel (no CUDA toolkit needed)
 echo "      Installing APEX from pre-built wheel..."
 pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl
 
