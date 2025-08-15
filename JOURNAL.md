@@ -1,5 +1,37 @@
 # Engineering Journal
 
+## 2025-08-15 21:45
+
+### PyTorch Base Image Strategic Shift - L40 GPU Compatibility Solution |TASK:TASK-2025-08-15-007|
+- **What**: Implemented comprehensive new approach using PyTorch official base image to solve persistent L40 GPU compatibility issues
+- **Why**: After 60+ commits attempting manual Ubuntu 22.04 + dependency management, need strategic shift to proven, pre-validated environment that eliminates complexity
+- **How**: 
+  - **Problem Analysis**: Complex dependency management creating conflicts and L40 GPU kernel compatibility issues
+  - **Strategic Decision**: Shift to `pytorch/pytorch:2.7.1-cuda12.6-cudnn9-devel` base image for proven CUDA 12.6 + L40 support
+  - **New Architecture**: 
+    - `Dockerfile.pytorch`: Clean PyTorch base with early flash-attention v2.8.3 installation
+    - `run_pytorch.sh`: Simplified runtime with comprehensive environment validation
+    - Enhanced `download.py`: Added detailed version logging for debugging flash-attention compatibility
+    - `README_pytorch_approach.md`: Complete documentation of new strategy
+  - **Key Improvements**:
+    - Flash-attention installed before dependency conflicts 
+    - Minimal selective package installation vs problematic requirements.txt
+    - Built-in environment debugging and version reporting
+    - Leverages PyTorch team's pre-validated CUDA environment
+- **Issues**: 
+  - Previous Ubuntu approach created 60+ commits for basic containerization
+  - Manual dependency management prone to version conflicts and missing L40 support
+  - Flash-attention compatibility required extensive debugging without clear resolution path
+- **Result**: 
+  - **Complete New Approach**: 4 new files providing clean alternative to existing complex setup
+  - **L40 GPU Strategy**: CUDA 12.6 base + flash-attention 2.8.3 likely resolves compute capability 8.9 issues
+  - **Reduced Complexity**: PyTorch base eliminates manual CUDA/PyTorch installation complexity
+  - **Environment Debugging**: Real-time version reporting helps validate flash-attention compatibility
+  - **Maintainable Solution**: Standard base image approach vs custom Ubuntu build
+  - Ready for testing: `docker build -f Dockerfile.pytorch -t seedvr-pytorch:latest .`
+
+---
+
 ## 2025-08-15 10:30
 
 ### Critical Disk Space Optimization - Symbolic Links Implementation |TASK:TASK-2025-08-15-006|

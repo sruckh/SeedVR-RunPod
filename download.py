@@ -119,6 +119,25 @@ if __name__ == "__main__":
         exit(1)
         
     print(f"--- DISK SPACE OPTIMIZATION: Saved {total_space_saved:.1f} MB by using symlinks ---")
+    
+    # Print environment version information for flash-attention compatibility debugging
+    print("--- ENVIRONMENT INFO (for flash-attention compatibility) ---")
+    try:
+        import sys
+        import torch
+        print(f"Python version: {sys.version.split()[0]}")
+        print(f"PyTorch version: {torch.__version__}")
+        print(f"CUDA version: {torch.version.cuda}")
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        if torch.cuda.is_available():
+            print(f"GPU device: {torch.cuda.get_device_name(0)}")
+            print(f"CUDA capability: {torch.cuda.get_device_capability(0)}")
+        # Check flash-attention
+        import flash_attn
+        print(f"Flash-attention version: {flash_attn.__version__}")
+    except Exception as e:
+        print(f"Error getting version info: {e}")
+    print("--- END ENVIRONMENT INFO ---")
     print("--- All efficient symbolic links created successfully ---")
     print("--- SeedVR inference scripts should now find all required model files ---")
     print("--- All models downloaded successfully with optimal disk usage! ---")
