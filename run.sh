@@ -31,6 +31,10 @@ echo "      Done."
 echo "[3/9] Installing dependencies from requirements.txt..."
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Install PyAV for video operations in torchvision (missing from original requirements.txt)
+echo "      Installing PyAV for video processing..."
+pip install av
 echo "      Done."
 
 # 4. Install the specific flash-attention wheel
@@ -63,39 +67,25 @@ pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0
 # Verify APEX installation
 echo "DEBUG: Verifying APEX installation in virtual environment..."
 echo "DEBUG: Testing basic apex import..."
-if python -c "import apex; print(f'APEX version: {apex.__version__}')" 2>&1; then
-    echo "      ✅ Basic APEX import successful"
+if python -c "import apex; print('APEX import successful')" 2>/dev/null; then
+    echo "      ✅ APEX successfully installed and verified"
     echo "DEBUG: Testing FusedRMSNorm import..."
-    if python -c "from apex.normalization import FusedRMSNorm; print('FusedRMSNorm import successful')" 2>&1; then
-        echo "      ✅ APEX successfully installed and verified from pre-built wheel"
+    if python -c "from apex.normalization import FusedRMSNorm; print('FusedRMSNorm import successful')" 2>/dev/null; then
+        echo "      ✅ FusedRMSNorm available"
     else
-        echo "      ⚠️  FusedRMSNorm import failed - checking what's available in apex.normalization..."
-        python -c "import apex.normalization; print('Available in apex.normalization:', dir(apex.normalization))" 2>&1 || echo "apex.normalization module not found"
+        echo "      ⚠️  FusedRMSNorm not available - fallback will be used"
     fi
 else
-    echo "      ⚠️  Basic APEX import failed"
-    python -c "import apex" 2>&1 || echo "APEX import error details shown above"
+    echo "      ⚠️  APEX installation verification failed - fallback will be used"
 fi
 
 echo "      Done."
 
-# 6. Patch inference scripts to point to correct model paths  
-echo "[6/9] Patching inference scripts for correct model paths..."
-if [ -f "projects/inference_seedvr2_3b.py" ]; then
-    sed -i 's|\./ckpts/seedvr2_ema_3b\.pth|/workspace/SeedVR/ckpts/SeedVR2-3B/seedvr2_ema_3b.pth|g' projects/inference_seedvr2_3b.py
-    echo "      Patched inference_seedvr2_3b.py"
-else
-    echo "      WARNING: projects/inference_seedvr2_3b.py not found, skipping patch"
-fi
-if [ -f "projects/inference_seedvr2_7b.py" ]; then
-    sed -i 's|\./ckpts/seedvr2_ema_7b\.pth|/workspace/SeedVR/ckpts/SeedVR2-7B/seedvr2_ema_7b.pth|g' projects/inference_seedvr2_7b.py
-    echo "      Patched inference_seedvr2_7b.py"
-else
-    echo "      WARNING: projects/inference_seedvr2_7b.py not found, skipping patch"
-fi
-
-# VAE model paths handled by download.py - no code patching needed
-echo "      VAE model paths handled in download process..."
+# 6. Model path configuration handled architecturally
+echo "[6/9] Model path configuration..."
+# Model paths are handled architecturally by download.py - no code patching needed
+# This avoids timing issues where patches run before model files exist
+echo "      Model paths handled architecturally in download process"
 echo "      Done."
 
 # 7. Place the color_fix.py utility into the project

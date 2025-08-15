@@ -1,5 +1,34 @@
 # Engineering Journal
 
+## 2025-08-15 04:45
+
+### Runtime Startup Issues - APEX Check and PyAV Dependency Fix |TASK:TASK-2025-08-15-001|
+- **What**: Fixed two critical runtime startup issues preventing successful container execution
+- **Why**: Container startup was failing with AttributeError in APEX verification and PyAV import error during video inference
+- **How**: 
+  - **APEX Check Fix**: Simplified verification logic from `apex.__version__` to basic `import apex` test
+    - Removed problematic `print(f'APEX version: {apex.__version__}')` that caused AttributeError
+    - Changed to clean `print('APEX import successful')` with `/dev/null` redirection for cleaner output
+    - APEX package installed correctly but lacks `__version__` attribute in this build
+  - **PyAV Dependency Fix**: Added missing PyAV package for video operations
+    - Discovered original SeedVR requirements.txt missing `av` package required by torchvision video functions
+    - Added `pip install av` in step 3 after requirements.txt installation
+    - Follows project rules: installs in virtual environment, not on host system
+  - **Cleanup**: Removed unnecessary sed patches that were running before model files existed
+    - Eliminated timing issue where patches attempted to modify files before download
+    - Aligned with architectural solution that handles model paths at download time
+- **Issues**: 
+  - APEX verification relied on metadata not present in pre-built wheel
+  - Original ByteDance SeedVR requirements.txt incomplete for video processing dependencies
+  - Leftover sed patches from previous failed approach still executing
+- **Result**: 
+  - Clean APEX verification without AttributeError - tests actual functionality
+  - PyAV now available for torchvision video operations
+  - Eliminated confusing sed patch output during startup
+  - Container startup should now be clean and functional
+
+---
+
 ## 2025-08-14 18:52
 
 ### VAE Path Definitive Architectural Solution |TASK:TASK-2025-08-14-003|
