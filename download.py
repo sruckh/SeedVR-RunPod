@@ -32,10 +32,13 @@ if __name__ == "__main__":
     download_model(model_3b_repo, "SeedVR2-3B")
     download_model(model_7b_repo, "SeedVR2-7B")
 
-    # ARCHITECTURAL FIX: Copy VAE file to expected location
-    # The VAE file is identical between 3B and 7B models, so we copy it once
-    # to where the original code expects it: ./ckpts/ema_vae.pth
+    # ARCHITECTURAL FIXES: Copy model files to expected locations
+    # Following successful VAE fix pattern - adapt environment to code expectations
     import shutil
+    
+    print("--- Applying architectural path fixes ---")
+    
+    # Fix 1: VAE model (already working)
     source_vae = "ckpts/SeedVR2-3B/ema_vae.pth"
     target_vae = "ckpts/ema_vae.pth"
     
@@ -47,4 +50,51 @@ if __name__ == "__main__":
         print(f"!!! VAE file not found at {source_vae} !!!")
         exit(1)
 
+    # Fix 2: Main 3B model - inference_seedvr2_3b.py expects ./ckpts/seedvr2_ema_3b.pth
+    source_3b = "ckpts/SeedVR2-3B/seedvr2_ema_3b.pth"
+    target_3b = "ckpts/seedvr2_ema_3b.pth"
+    
+    if os.path.exists(source_3b):
+        shutil.copy2(source_3b, target_3b)
+        print(f"--- Copied 3B model: {source_3b} -> {target_3b} ---")
+        print("--- 3B model is now available at expected location ---")
+    else:
+        print(f"!!! 3B model file not found at {source_3b} !!!")
+        exit(1)
+
+    # Fix 3: Main 7B model - inference_seedvr2_7b.py expects ./ckpts/seedvr2_ema_7b.pth  
+    source_7b = "ckpts/SeedVR2-7B/seedvr2_ema_7b.pth"
+    target_7b = "ckpts/seedvr2_ema_7b.pth"
+    
+    if os.path.exists(source_7b):
+        shutil.copy2(source_7b, target_7b)
+        print(f"--- Copied 7B model: {source_7b} -> {target_7b} ---")
+        print("--- 7B model is now available at expected location ---")
+    else:
+        print(f"!!! 7B model file not found at {source_7b} !!!")
+        exit(1)
+        
+    # Verify all expected model files now exist
+    expected_files = [
+        "ckpts/ema_vae.pth",
+        "ckpts/seedvr2_ema_3b.pth", 
+        "ckpts/seedvr2_ema_7b.pth"
+    ]
+    
+    print("--- Verifying all model files are available at expected locations ---")
+    all_files_exist = True
+    for expected_file in expected_files:
+        if os.path.exists(expected_file):
+            file_size = os.path.getsize(expected_file) / (1024 * 1024)  # Size in MB
+            print(f"✅ {expected_file} exists ({file_size:.1f} MB)")
+        else:
+            print(f"❌ {expected_file} MISSING")
+            all_files_exist = False
+    
+    if not all_files_exist:
+        print("!!! ERROR: Some model files are missing after architectural fixes !!!")
+        exit(1)
+        
+    print("--- All architectural path fixes completed successfully ---")
+    print("--- SeedVR inference scripts should now find all required model files ---")
     print("--- All models downloaded successfully! ---")
