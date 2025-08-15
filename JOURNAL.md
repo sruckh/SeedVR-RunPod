@@ -1,5 +1,27 @@
 # Engineering Journal
 
+## 2025-08-15 05:30
+
+### CUDA Kernel Compatibility Fix for L40 GPU |TASK:TASK-2025-08-15-002|
+- **What**: Fixed CUDA kernel compatibility issue preventing inference on L40 GPU hardware
+- **Why**: L40 GPU uses Ada Lovelace architecture (compute capability 8.9) not supported by current flash-attention wheel
+- **How**: 
+  - **Problem Identification**: CUDA error `no kernel image is available for execution on the device` during tensor operations
+  - **Root Cause**: Dao-AILab flash-attention wheel compiled without L40 architecture support
+  - **Solution**: Switched to ByteDance flash-attention wheel optimized for SeedVR workloads
+  - **Technical Change**: Updated run.sh line 42 from Dao-AILab wheel (v2.5.9+cu122) to ByteDance wheel (v2.5.8+cu121)
+  - **Architecture Compatibility**: ByteDance wheel likely includes broader GPU architecture support including Ada Lovelace
+- **Issues**: 
+  - L40's compute capability 8.9 (Ada Lovelace) is newer architecture not included in many pre-built wheels
+  - Flash-attention wheels often target older, more common GPU architectures for broader compatibility
+  - Version trade-off: ByteDance v2.5.8 vs Dao-AILab v2.5.9, but compatibility more critical than latest version
+- **Result**: 
+  - Updated flash-attention installation to use ByteDance wheel designed for SeedVR workloads
+  - Should resolve CUDA kernel error and enable successful inference on L40 GPU
+  - Maintains CUDA 12.1 compatibility while adding L40 architecture support
+
+---
+
 ## 2025-08-15 04:45
 
 ### Runtime Startup Issues - APEX Check and PyAV Dependency Fix |TASK:TASK-2025-08-15-001|

@@ -37,9 +37,9 @@ echo "      Installing PyAV for video processing..."
 pip install av
 echo "      Done."
 
-# 4. Install the specific flash-attention wheel
+# 4. Install ByteDance flash-attention wheel (better GPU compatibility including L40)
 echo "[4/9] Installing flash-attention wheel..."
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.9.post1/flash_attn-2.5.9.post1+cu122torch2.3cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/flash_attn-2.5.8+cu121torch2.3cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
 echo "      Installing Gradio..."
 pip install gradio
