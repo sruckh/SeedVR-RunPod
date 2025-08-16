@@ -4,33 +4,17 @@
 source /workspace/venv/bin/activate
 
 # Install torch
-pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
-
-# Install flash-attn
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.8/flash_attn-2.5.8+cu122torch2.1cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+pip install -r /workspace/requirements.txt
 
 # Clone the repository
 git clone https://github.com/ByteDance-Seed/SeedVR.git
 cd SeedVR
 
-# Install requirements
-pip install -r requirements.txt
-
-# Install apex
-pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl --no-deps
-
 # Download color_fix.py
 wget https://raw.githubusercontent.com/pkuliyi2015/sd-webui-stablesr/master/srmodule/colorfix.py -O ./projects/video_diffusion_sr/color_fix.py
 
-# Install huggingface_hub for downloading models
-pip install huggingface_hub
-
 # Download the models
 python3 /workspace/download.py
-
-
-# Install gradio for the web interface
-pip install gradio
 
 # Launch the Gradio web interface
 python3 /workspace/app.py

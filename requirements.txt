@@ -1,0 +1,14 @@
+torch==2.7.0
+torchvision==0.22.0
+torchaudio==2.7.0
+flash-attn==2.5.8+cu122torch2.1cxx11abiFALSE -f https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.8/flash_attn-2.5.8+cu122torch2.1cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+einops==0.7.0
+omegaconf==2.3.0
+opencv-python==4.9.0.80
+diffusers==0.29.1
+rotary-embedding-torch==0.5.3
+transformers==4.38.2
+mediapy==1.2.0
+gradio
+huggingface_hub
+apex==0.1 -f https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl

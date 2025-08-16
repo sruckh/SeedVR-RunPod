@@ -27,6 +27,7 @@ ENV PATH="/workspace/venv/bin:$PATH"
 
 # Copy the run script and make it executable
 COPY run.sh .
+COPY requirements.txt .
 RUN chmod +x run.sh
 
 # Command to run when the container starts
