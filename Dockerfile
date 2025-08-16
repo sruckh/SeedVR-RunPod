@@ -13,10 +13,9 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install flash-attention using ByteDance wheel (proven L40 compatibility)
-# Using v2.5.8 from SeedVR team - tested with their models and L40 GPU
-RUN pip install --no-cache-dir --force-reinstall --no-deps \
-    https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/flash_attn-2.5.8+cu121torch2.3cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+# Install flash-attention from PyPI (compatible with PyTorch base image)
+# PyPI version handles platform compatibility automatically
+RUN pip install --no-cache-dir flash-attn
 
 # Clone SeedVR repository
 RUN git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR

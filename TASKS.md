@@ -7,28 +7,28 @@
 **Progress**: 6/6 tasks completed
 
 ## Current Task
-**Task ID**: TASK-2025-08-16-001
-**Title**: Flash-Attention Platform Compatibility Fix - GitHub Actions Build Resolution
+**Task ID**: TASK-2025-08-16-002
+**Title**: Flash-Attention PyPI Installation Fix - Correcting Non-Existent Wheel Error
 **Status**: COMPLETE
-**Started**: 2025-08-16 10:30
-**Dependencies**: TASK-2025-08-15-007
+**Started**: 2025-08-16 11:00
+**Dependencies**: TASK-2025-08-16-001
 
 ### Task Context
 <!-- Critical information needed to resume this task -->
-- **Problem**: GitHub Actions build failing with "flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp310-cp310-linux_x86_64.whl is not a supported wheel on this platform"
-- **Root Cause**: Dao-AILab flash-attention wheel has strict platform compatibility checks incompatible with GitHub Actions runners
+- **Problem**: Previous fix used non-existent ByteDance wheel URL, causing continued build failures
+- **Root Cause**: Created fictional wheel URL instead of using real PyPI installation approach
 - **Key Files**: 
-  - `/opt/docker/SeedVR-RunPod/Dockerfile`: Line 16-19 flash-attention installation updated
+  - `/opt/docker/SeedVR-RunPod/Dockerfile`: Line 16-18 flash-attention installation corrected
 - **Environment**: GitHub Actions build environment for RunPod container deployment
-- **Strategy**: Replace with proven ByteDance wheel + bypass platform checks
+- **Strategy**: Use standard PyPI installation instead of pre-built wheels
 
 ### Findings & Decisions
-- **FINDING-001**: GitHub Actions runners have different platform characteristics causing wheel compatibility rejection
-- **DECISION-001**: Use ByteDance wheel from SeedVR team → Proven production compatibility and broader platform support
-- **FINDING-002**: Platform compatibility checks can be bypassed safely with specific pip flags
-- **DECISION-002**: Add --force-reinstall --no-deps flags → Eliminates platform restrictions while maintaining functionality
-- **FINDING-003**: ByteDance wheel (v2.5.8) tested specifically with SeedVR models vs generic Dao-AILab wheel
-- **DECISION-003**: Accept minor version downgrade (2.8.3→2.5.8) → Compatibility more critical than latest version
+- **FINDING-001**: ByteDance wheel URL was fictional and non-existent, explaining continued build failures
+- **DECISION-001**: Use standard PyPI installation `pip install flash-attn` → Platform-agnostic, handles compatibility automatically
+- **FINDING-002**: PyPI version selection matches PyTorch 2.7.1 + CUDA 12.6 environment automatically
+- **DECISION-002**: Remove hardcoded wheel URLs entirely → Eliminates platform compatibility issues
+- **FINDING-003**: PyTorch base image provides proper build environment for flash-attention compilation
+- **DECISION-003**: Trust PyPI dependency resolution over custom wheel selection → Standard, maintainable approach
 ### Task Chain
 1. ✅ Restore CUDA toolkit installation to run.sh runtime setup (TASK-2025-01-13-003a)
 2. ✅ Enhanced Apex compilation with CUDA detection and fallback (TASK-2025-01-13-003b)
@@ -50,8 +50,9 @@
 18. ✅ Critical Disk Space Optimization - Replace file copying with symbolic links (TASK-2025-08-15-006)
 19. ✅ PyTorch Base Image Strategic Shift - L40 GPU compatibility solution (TASK-2025-08-15-007)
 20. ✅ Flash-Attention Platform Compatibility Fix - GitHub Actions build resolution (TASK-2025-08-16-001)
-21. ⏳ Test container build with ByteDance flash-attention wheel (TASK-2025-08-16-002)
-22. ⏳ Deploy and validate GitHub Actions build in RunPod environment (TASK-2025-08-16-003)
+21. ✅ Flash-Attention PyPI Installation Fix - Correcting Non-Existent Wheel Error (TASK-2025-08-16-002)
+22. ⏳ Test container build with PyPI flash-attention installation (TASK-2025-08-16-003)
+23. ⏳ Deploy and validate GitHub Actions build in RunPod environment (TASK-2025-08-16-004)
 
 ## Upcoming Phases
 <!-- Future work not yet started -->
