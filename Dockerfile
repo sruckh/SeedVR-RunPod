@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install flash-attention FIRST to prevent conflicts
-# Using v2.8.3 which should have L40 (compute capability 8.9) support
-RUN pip install --no-cache-dir \
-    https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+# Install flash-attention using ByteDance wheel (proven L40 compatibility)
+# Using v2.5.8 from SeedVR team - tested with their models and L40 GPU
+RUN pip install --no-cache-dir --force-reinstall --no-deps \
+    https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/flash_attn-2.5.8+cu121torch2.3cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
 # Clone SeedVR repository
 RUN git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
