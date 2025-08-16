@@ -10,14 +10,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install basic dependencies
 RUN apt-get update && apt-get install -y \
     git \
-    python3.11 \
-    python3.11-venv \
+    python3.10 \
+    python3.10-venv \
     wget \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a python virtual environment
-RUN python3.11 -m venv /workspace/venv
+RUN python3.10 -m venv /workspace/venv
 
 # Activate virtual environment
 ENV PATH="/workspace/venv/bin:$PATH"

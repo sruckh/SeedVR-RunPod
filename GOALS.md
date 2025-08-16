@@ -15,7 +15,7 @@ Create github action to build and deploy container image to Dockerhub.  Use the 
 Make sure to understand Container Image Environment, The bootstrap runtime environment, and the python virtual environment.  Know what happens in each environment.
 
 In Runtime install these early on and make sure later they do not get overwritten.
-1) Create a python 3.11 virtual environment
+1) Create a python 3.10 virtual environment
 2) Torch Version: pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
 3) flash_attn version: https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
 

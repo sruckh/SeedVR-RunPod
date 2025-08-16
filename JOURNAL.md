@@ -35,3 +35,12 @@
 - **How**: Changed the secret names in the `.github/workflows/main.yml` file.
 - **Issues**: None.
 - **Result**: The GitHub Action should now be able to successfully authenticate with Docker Hub.
+
+## 2025-08-16 21:32
+
+### Downgraded to Python 3.10
+- **What**: Downgraded the Python environment from 3.11 to 3.10.
+- **Why**: The `apex` library requires Python 3.10.
+- **How**: Updated the `Dockerfile` to install Python 3.10 and the `run.sh` script to use the correct `apex` and `flash-attn` wheels for Python 3.10.
+- **Issues**: None.
+- **Result**: The container should now build successfully with the correct Python environment and dependencies.
