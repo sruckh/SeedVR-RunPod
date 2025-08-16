@@ -1,32 +1,41 @@
 #!/bin/bash
-# SeedVR-RunPod: Simplified run script for PyTorch base image
-# Eliminates complex dependency management and focuses on model setup
 
-set -e
+# Activate virtual environment
+source /workspace/venv/bin/activate
 
-echo "--- SeedVR PyTorch Base Runtime ---"
+# Install torch
+pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
 
-# Environment validation
-echo "Environment Info:"
-python -c "import sys, torch; print(f'Python: {sys.version.split()[0]}'); print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.version.cuda}'); print(f'GPU Available: {torch.cuda.is_available()}')"
+# Install flash-attn
+pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
 
-if python -c "import torch; exit(0 if torch.cuda.is_available() else 1)"; then
-    python -c "import torch; print(f'GPU: {torch.cuda.get_device_name(0)}'); print(f'Compute capability: {torch.cuda.get_device_capability(0)}')"
-else
-    echo "⚠️ WARNING: CUDA not available"
-fi
+# Clone the repository
+git clone https://github.com/ByteDance-Seed/SeedVR.git
+cd SeedVR
 
-# Verify flash-attention
-echo "Flash-attention status:"
-python -c "import flash_attn; print(f'Flash-attention version: {flash_attn.__version__}')"
+# Install requirements
+pip install -r requirements.txt
 
-# Change to SeedVR directory
-cd /workspace/SeedVR
+# Install apex
+pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl --no-deps
 
-# Download models if needed
-echo "Downloading SeedVR models..."
-python download.py
+# Download color_fix.py
+wget https://raw.githubusercontent.com/pkuliyi2015/sd-webui-stablesr/master/srmodule/colorfix.py -O ./projects/video_diffusion_sr/color_fix.py
 
-# Start the application
-echo "Starting SeedVR application..."
-exec python app.py
+# Install huggingface_hub for downloading models
+pip install huggingface_hub
+
+# Download the models
+python3 /workspace/download.py
+
+# Install huggingface_hub for downloading models
+pip install huggingface_hub
+
+# Download the models
+python3 /workspace/download.py
+
+# Install gradio for the web interface
+pip install gradio
+
+# Launch the Gradio web interface
+python3 /workspace/app.py

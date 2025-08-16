@@ -1,32 +1,30 @@
-# Base image
-FROM python:3.10-slim
+# Base Image
+FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu24.04
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONUNBUFFERED=1
-ENV PIP_NO_CACHE_DIR=1
-
-# Install essential system dependencies (CUDA toolkit installed at runtime)
-RUN apt-get update && apt-get install -y \
-    git \
-    wget \
-    ffmpeg \
-    build-essential \
-    ninja-build \
-    gnupg2 \
-    curl \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory
+# Set working directory
 WORKDIR /workspace
 
-# Copy all necessary scripts and make run.sh executable
+# Set DEBIAN_FRONTEND to noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install basic dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    python3.11 \
+    python3.11-venv \
+    wget \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a python virtual environment
+RUN python3.11 -m venv /workspace/venv
+
+# Activate virtual environment
+ENV PATH="/workspace/venv/bin:$PATH"
+
+# Copy the run script and make it executable
 COPY run.sh .
-COPY download.py .
-COPY app.py .
-COPY color_fix.py .
 RUN chmod +x run.sh
 
-# Set the entrypoint for the container
+# Command to run when the container starts
 CMD ["./run.sh"]
