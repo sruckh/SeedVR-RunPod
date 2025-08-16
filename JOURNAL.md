@@ -17,3 +17,12 @@
 - **How**: Replaced the direct wheel installation with a build from the official NVIDIA apex repository. Also removed duplicate `huggingface_hub` installation and `download.py` execution.
 - **Issues**: None.
 - **Result**: The container build should now complete successfully.
+
+## 2025-08-16 21:11
+
+### Fixed GitHub Action Authentication
+- **What**: Updated the GitHub Action workflow to use the latest versions of the `actions/checkout`, `docker/login-action`, and `docker/build-push-action`.
+- **Why**: The previous versions were causing authentication errors with Docker Hub and using deprecated commands.
+- **How**: Changed the version numbers of the actions in the `.github/workflows/main.yml` file.
+- **Issues**: None.
+- **Result**: The GitHub Action should now authenticate with Docker Hub and run without warnings.
