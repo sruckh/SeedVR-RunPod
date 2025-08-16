@@ -8,12 +8,15 @@ WORKDIR /workspace
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install basic dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
     git \
     python3.10 \
     python3.10-venv \
-    wget \
-    --no-install-recommends && \
+    wget && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a python virtual environment
