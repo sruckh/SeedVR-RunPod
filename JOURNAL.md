@@ -26,3 +26,12 @@
 - **How**: Changed the version numbers of the actions in the `.github/workflows/main.yml` file.
 - **Issues**: None.
 - **Result**: The GitHub Action should now authenticate with Docker Hub and run without warnings.
+
+## 2025-08-16 21:15
+
+### Corrected Docker Hub Secret Names
+- **What**: Updated the GitHub Action workflow to use the correct secret names for Docker Hub authentication.
+- **Why**: The workflow was using `DOCKER_USERNAME` and `DOCKER_PASSWORD` instead of `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`.
+- **How**: Changed the secret names in the `.github/workflows/main.yml` file.
+- **Issues**: None.
+- **Result**: The GitHub Action should now be able to successfully authenticate with Docker Hub.
