@@ -8,3 +8,12 @@
 - **How**: Created a Dockerfile with a CUDA base image, a run.sh script for runtime dependency installation, a Python script for model downloading, and a Gradio web interface for inference. Also set up a GitHub Action for automated builds and deployments to Docker Hub.
 - **Issues**: Encountered missing dependencies for `huggingface_hub` and `gradio`, which were resolved by adding installation steps to the `run.sh` script.
 - **Result**: A fully containerized SeedVR application ready for deployment on RunPod.
+
+## 2025-08-16 21:09
+
+### Fixed Build Failure
+- **What**: Corrected the `apex` installation and removed redundant commands in `run.sh`.
+- **Why**: The previous `apex` wheel was incompatible with Python 3.11, causing the build to fail.
+- **How**: Replaced the direct wheel installation with a build from the official NVIDIA apex repository. Also removed duplicate `huggingface_hub` installation and `download.py` execution.
+- **Issues**: None.
+- **Result**: The container build should now complete successfully.

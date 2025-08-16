@@ -17,7 +17,9 @@ cd SeedVR
 pip install -r requirements.txt
 
 # Install apex
-pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl --no-deps
+pip install ninja
+pip install packaging
+pip install git+https://github.com/NVIDIA/apex.git
 
 # Download color_fix.py
 wget https://raw.githubusercontent.com/pkuliyi2015/sd-webui-stablesr/master/srmodule/colorfix.py -O ./projects/video_diffusion_sr/color_fix.py
@@ -28,11 +30,6 @@ pip install huggingface_hub
 # Download the models
 python3 /workspace/download.py
 
-# Install huggingface_hub for downloading models
-pip install huggingface_hub
-
-# Download the models
-python3 /workspace/download.py
 
 # Install gradio for the web interface
 pip install gradio
