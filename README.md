@@ -2,6 +2,8 @@
 
 A lightweight Docker container for deploying SeedVR video restoration models on RunPod. Supports both **SeedVR2-3B** and **SeedVR2-7B** models with a user-friendly Gradio interface.
 
+> **🚀 Recent Update**: Now uses PyTorch 2.7.1 + CUDA 12.6 base image for improved L40 GPU compatibility and reduced complexity. See `README_pytorch_approach.md` for technical details.
+
 ## 🚀 Features
 
 - **Dual Model Support**: Choose between SeedVR2-3B (faster) or SeedVR2-7B (higher quality)
@@ -24,9 +26,10 @@ A lightweight Docker container for deploying SeedVR video restoration models on 
 ### Software
 - Docker with NVIDIA GPU support
 - NVIDIA Docker runtime
-- **Python 3.10** (fixed version for compatibility)
-- **PyTorch 2.4.0** with **CUDA 12.1** support (fixed versions)
-- **Specific package versions** as defined in requirements.txt
+- **Python 3.10** (PyTorch base image)
+- **PyTorch 2.7.1** with **CUDA 12.6** support (PyTorch official base)
+- **Flash-attention 2.8.3** for L40 GPU compatibility
+- **Minimal dependencies** - selective installation vs full requirements.txt
 
 ## 🐳 Docker Hub
 

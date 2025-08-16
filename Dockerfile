@@ -1,32 +1,57 @@
-# Base image
-FROM python:3.10-slim
+# SeedVR-RunPod: PyTorch Base Image Approach
+# Addresses L40 GPU compatibility and reduces complexity from 60+ commits
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONUNBUFFERED=1
-ENV PIP_NO_CACHE_DIR=1
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-devel
 
-# Install essential system dependencies (CUDA toolkit installed at runtime)
+# Set working directory
+WORKDIR /workspace
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     wget \
     ffmpeg \
-    build-essential \
-    ninja-build \
-    gnupg2 \
-    curl \
-    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
-WORKDIR /workspace
+# Install flash-attention FIRST to prevent conflicts
+# Using v2.8.3 which should have L40 (compute capability 8.9) support
+RUN pip install --no-cache-dir \
+    https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
-# Copy all necessary scripts and make run.sh executable
-COPY run.sh .
-COPY download.py .
-COPY app.py .
-COPY color_fix.py .
-RUN chmod +x run.sh
+# Clone SeedVR repository
+RUN git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
+WORKDIR /workspace/SeedVR
 
-# Set the entrypoint for the container
-CMD ["./run.sh"]
+# Print environment info for debugging
+RUN python -c "import sys, torch; print(f'Python: {sys.version.split()[0]}'); print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.version.cuda}'); print(f'GPU Available: {torch.cuda.is_available()}')"
+
+# Install minimal SeedVR dependencies (carefully avoiding PyTorch conflicts)
+RUN pip install --no-cache-dir \
+    transformers \
+    diffusers \
+    accelerate \
+    xformers \
+    av \
+    pillow \
+    opencv-python \
+    numpy \
+    scipy \
+    tqdm \
+    gradio
+
+# Copy our optimized files
+COPY download.py /workspace/SeedVR/
+COPY app.py /workspace/SeedVR/
+
+# Verify flash-attention installation
+RUN python -c "import flash_attn; print(f'Flash-attention version: {flash_attn.__version__}')"
+
+# Set environment variables
+ENV PYTHONPATH="/workspace/SeedVR:$PYTHONPATH"
+ENV GRADIO_SHARE=0
+
+# Expose port
+EXPOSE 7860
+
+# Run the application
+CMD ["python", "app.py"]
