@@ -6,9 +6,9 @@ set -e
 # 1. Install Python 3.10
 echo "Installing Python 3.10..."
 export DEBIAN_FRONTEND=noninteractive
-apt-get update && apt-get install -y software-properties-common
+apt-get update && apt-get install -y --no-install-recommends software-properties-common
 add-apt-repository -y ppa:deadsnakes/ppa
-apt-get update && apt-get install -y python3.10 python3.10-venv git
+apt-get update && apt-get install -y --no-install-recommends python3.10 python3.10-venv git
 
 # 2. Create a python 3.10 virtual environment
 echo "Creating Python 3.10 virtual environment..."
@@ -21,7 +21,7 @@ pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
 
 # 4. Install flash-attn
 echo "Installing flash-attention..."
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.7cxx11abiFALSE-cp311-cp311-linux_x86_64.whl
+pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
 
 # 5. Clone the SeedVR git repository
 echo "Cloning SeedVR repository..."
