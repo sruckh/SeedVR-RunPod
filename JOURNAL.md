@@ -1,5 +1,14 @@
 # Engineering Journal
 
+## 2025-08-17 05:52
+
+### Refactored Dependency Management
+- **What**: Consolidated all Python dependencies into a single `requirements.txt` file.
+- **Why**: To resolve version conflicts and prevent environment instability caused by multiple `pip install` commands overwriting packages.
+- **How**: Created a `requirements.txt` file with all necessary packages and specific versions. Modified `run.sh` to install dependencies from this file and updated the `Dockerfile` to include it in the container image.
+- **Issues**: The initial `git commit` command seemed to hang, but the subsequent `git push` was successful.
+- **Result**: A more stable and reproducible build process with unified dependency management.
+
 ## 2025-08-16 21:06
 
 ### SeedVR Containerization for RunPod
@@ -44,3 +53,12 @@
 - **How**: Updated the `Dockerfile` to install Python 3.10 and the `run.sh` script to use the correct `apex` and `flash-attn` wheels for Python 3.10.
 - **Issues**: None.
 - **Result**: The container should now build successfully with the correct Python environment and dependencies.
+
+## 2025-08-16 21:35
+
+### Fixed Docker Build Failure for Python 3.10
+- **What**: Resolved the `E: Unable to locate package python3.10-venv` error during the Docker build.
+- **Why**: The Ubuntu 24.04 base image does not have Python 3.10 packages in its default repositories.
+- **How**: Modified the `Dockerfile` to add the `deadsnakes` PPA, which is a well-known source for multiple Python versions on Ubuntu. This makes `python3.10` and `python3.10-venv` available for installation.
+- **Issues**: None.
+- **Result**: The Docker container should now build successfully on GitHub Actions with Python 3.10 correctly installed.
