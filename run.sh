@@ -17,7 +17,11 @@ source /workspace/venv/bin/activate
 
 # 3. Clone the SeedVR git repository
 echo "Cloning SeedVR repository..."
-git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
+if [ -d "/workspace/SeedVR" ] && [ "$(ls -A /workspace/SeedVR)" ]; then
+    echo "SeedVR directory already exists and is not empty. Skipping clone."
+else
+    git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
+fi
 
 # 4. Change the working directory
 cd /workspace/SeedVR

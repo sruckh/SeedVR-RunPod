@@ -12,3 +12,4 @@ torchvision==0.18.0
 # Project specific
 gradio
 huggingface_hub
+wheel
