@@ -2,7 +2,7 @@ import gradio as gr
 import os
 import subprocess
 
-1def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps):
+def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps):
     # Set the input and output paths
     input_path = "/tmp/input_video"
     output_path = "/tmp/output_video"
