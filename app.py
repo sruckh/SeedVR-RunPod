@@ -1,62 +1,88 @@
 import gradio as gr
-import subprocess
 import os
+import subprocess
 
-def run_inference(model_size, video_path, output_dir, seed, res_h, res_w, sp_size):
-    """
-    Runs the SeedVR inference script with the specified parameters.
-    """
-    if model_size == "3B":
-        script_path = "projects/inference_seedvr2_3b.py"
+1def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps):
+    # Set the input and output paths
+    input_path = "/tmp/input_video"
+    output_path = "/tmp/output_video"
+    os.makedirs(input_path, exist_ok=True)
+    os.makedirs(output_path, exist_ok=True)
+
+    # Save the uploaded video
+    video_filename = os.path.join(input_path, os.path.basename(video.name))
+    with open(video_filename, "wb") as f:
+        f.write(video.read())
+
+    # Determine which script to run
+    if model == "3B":
+        script_name = "projects/inference_seedvr2_3b.py"
+    elif model == "7B":
+        script_name = "projects/inference_seedvr2_7b.py"
     else:
-        script_path = "projects/inference_seedvr2_7b.py"
+        return "Invalid model selected."
 
-    num_gpus = 1  # Assuming a single GPU for now
-
+    # Construct the command
     command = [
         "torchrun",
-        f"--nproc-per-node={num_gpus}",
-        script_path,
-        "--video_path", video_path,
-        "--output_dir", output_dir,
+        "--nproc-per-node=1",
+        script_name,
+        "--video_path", input_path,
+        "--output_dir", output_path,
         "--seed", str(seed),
         "--res_h", str(res_h),
         "--res_w", str(res_w),
         "--sp_size", str(sp_size),
     ]
 
-    try:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            return f"Inference complete. Output saved to {output_dir}\n\nOutput:\n{stdout}"
-        else:
-            return f"Error during inference:\n{stderr}"
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
+    if out_fps:
+        command.extend(["--out_fps", str(out_fps)])
 
+    # Set environment variables for the new parameters
+    env = os.environ.copy()
+    env["CFG_SCALE"] = str(cfg_scale)
+    env["CFG_RESCALE"] = str(cfg_rescale)
+    env["SAMPLE_STEPS"] = str(sample_steps)
+
+    # Run the command
+    try:
+        subprocess.run(command, check=True, text=True, capture_output=True, env=env)
+    except subprocess.CalledProcessError as e:
+        return f"Error: {e.stderr}"
+
+    # Get the output file
+    output_files = os.listdir(output_path)
+    if not output_files:
+        return "No output file generated."
+
+    output_video_path = os.path.join(output_path, output_files[0])
+
+    return output_video_path
+
+# Create the Gradio interface
 with gr.Blocks() as demo:
-    gr.Markdown("# SeedVR Inference")
+    gr.Markdown("# SeedVR Video Restoration")
     with gr.Row():
-        model_size = gr.Dropdown(["3B", "7B"], label="Model Size", value="3B")
-    with gr.Row():
-        video_path = gr.Textbox(label="Input Video Path", value="examples/paris_eiffel_tower.mp4")
-        output_dir = gr.Textbox(label="Output Directory", value="results")
-    with gr.Row():
-        seed = gr.Number(label="Seed", value=123)
-        res_h = gr.Number(label="Output Height", value=512)
-        res_w = gr.Number(label="Output Width", value=512)
-        sp_size = gr.Number(label="SP Size", value=1)
-    with gr.Row():
-        run_button = gr.Button("Run Inference")
-    with gr.Row():
-        output_text = gr.Textbox(label="Output", interactive=False)
+        with gr.Column():
+            model = gr.Dropdown(["3B", "7B"], label="Model", value="3B")
+            video = gr.File(label="Input Video")
+            seed = gr.Number(label="Seed", value=666)
+            res_h = gr.Number(label="Output Height", value=720)
+            res_w = gr.Number(label="Output Width", value=1280)
+            sp_size = gr.Number(label="SP Size", value=1)
+            out_fps = gr.Number(label="Output FPS (optional)", value=None)
+            cfg_scale = gr.Slider(minimum=0.0, maximum=2.0, value=1.0, label="CFG Scale")
+            cfg_rescale = gr.Slider(minimum=0.0, maximum=1.0, value=0.0, label="CFG Rescale")
+            sample_steps = gr.Slider(minimum=1, maximum=10, step=1, value=1, label="Sample Steps")
+            run_button = gr.Button("Run Inference")
+        with gr.Column():
+            output_video = gr.Video(label="Output Video")
 
     run_button.click(
         fn=run_inference,
-        inputs=[model_size, video_path, output_dir, seed, res_h, res_w, sp_size],
-        outputs=output_text,
+        inputs=[model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps],
+        outputs=output_video,
     )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0")
+    demo.launch(server_name="0.0.0.0", server_port=7860)
