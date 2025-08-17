@@ -22,35 +22,31 @@ git clone https://github.com/ByteDance-Seed/SeedVR.git /workspace/SeedVR
 # 4. Change the working directory
 cd /workspace/SeedVR
 
-# 5. Install requirements.txt first
+# 5. Install requirements
 echo "Installing requirements..."
-pip install -r requirements.txt
+pip install -r /app/requirements.txt
 
-# 6. Install correct Torch versions
-echo "Installing Torch..."
-pip install --force-reinstall torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
-
-# 7. Install flash-attn
+# 6. Install flash-attn
 echo "Installing flash-attention..."
-pip install https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+pip install flash_attn==2.5.9.post1 --no-build-isolation
 
-# 8. Install apex
+# 7. Install apex
 echo "Installing apex..."
 pip install https://huggingface.co/ByteDance-Seed/SeedVR2-3B/resolve/main/apex-0.1-cp310-cp310-linux_x86_64.whl
 
-# 9. Copy color_fix.py
+# 8. Copy color_fix.py
 echo "Copying color_fix.py..."
 cp /app/color_fix.py ./projects/video_diffusion_sr/color_fix.py
 
-# 10. Copy modified inference scripts
+# 9. Copy modified inference scripts
 echo "Copying modified inference scripts..."
 cp /app/inference_seedvr2_3b_modified.py /workspace/SeedVR/projects/inference_seedvr2_3b.py
 cp /app/inference_seedvr2_7b_modified.py /workspace/SeedVR/projects/inference_seedvr2_7b.py
 
-# 11. Download models
+# 10. Download models
 echo "Downloading models..."
 python /app/download.py
 
-# 12. Launch Gradio app
+# 11. Launch Gradio app
 echo "Launching Gradio app..."
 python /app/app.py
