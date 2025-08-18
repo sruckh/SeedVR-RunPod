@@ -54,4 +54,5 @@ python /app/download.py
 
 # 11. Launch Gradio app
 echo "Launching Gradio app..."
+export PYTHONUNBUFFERED=1
 python /app/app.py
