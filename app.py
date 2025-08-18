@@ -1,6 +1,7 @@
 import gradio as gr
 import os
 import subprocess
+import shutil
 
 def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps):
     # Set the input and output paths
@@ -11,8 +12,7 @@ def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale,
 
     # Save the uploaded video
     video_filename = os.path.join(input_path, os.path.basename(video.name))
-    with open(video_filename, "wb") as f:
-        f.write(video.read())
+    shutil.copy(video.name, video_filename)
 
     # Determine which script to run
     if model == "3B":
@@ -85,4 +85,4 @@ with gr.Blocks() as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7860)
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
