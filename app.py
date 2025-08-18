@@ -4,6 +4,7 @@ import subprocess
 import shutil
 
 def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale, cfg_rescale, sample_steps):
+    print("--- Running inference ---")
     # Set the input and output paths
     input_path = "/tmp/input_video"
     output_path = "/tmp/output_video"
@@ -11,8 +12,10 @@ def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale,
     os.makedirs(output_path, exist_ok=True)
 
     # Save the uploaded video
+    print(f"Input video: {video.name}")
     video_filename = os.path.join(input_path, os.path.basename(video.name))
     shutil.copy(video.name, video_filename)
+    print(f"Video saved to: {video_filename}")
 
     # Determine which script to run
     if model == "3B":
@@ -21,6 +24,7 @@ def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale,
         script_name = "projects/inference_seedvr2_7b.py"
     else:
         return "Invalid model selected."
+    print(f"Using script: {script_name}")
 
     # Construct the command
     command = [
@@ -38,6 +42,8 @@ def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale,
     if out_fps:
         command.extend(["--out_fps", str(out_fps)])
 
+    print(f"Command: {' '.join(command)}")
+
     # Set environment variables for the new parameters
     env = os.environ.copy()
     env["CFG_SCALE"] = str(cfg_scale)
@@ -46,16 +52,27 @@ def run_inference(model, video, seed, res_h, res_w, sp_size, out_fps, cfg_scale,
 
     # Run the command
     try:
-        subprocess.run(command, check=True, text=True, capture_output=True, env=env)
+        result = subprocess.run(command, check=True, text=True, capture_output=True, env=env)
+        print("--- Inference stdout ---")
+        print(result.stdout)
+        print("--- Inference stderr ---")
+        print(result.stderr)
     except subprocess.CalledProcessError as e:
+        print(f"Error during inference: {e}")
+        print(f"--- Error stdout ---")
+        print(e.stdout)
+        print(f"--- Error stderr ---")
+        print(e.stderr)
         return f"Error: {e.stderr}"
 
     # Get the output file
+    print(f"Output directory content: {os.listdir(output_path)}")
     output_files = os.listdir(output_path)
     if not output_files:
         return "No output file generated."
 
     output_video_path = os.path.join(output_path, output_files[0])
+    print(f"Output video path: {output_video_path}")
 
     return output_video_path
 

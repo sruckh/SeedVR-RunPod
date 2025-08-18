@@ -2,6 +2,7 @@
 
 # Exit on error
 set -e
+set -x
 
 # 1. Install Python 3.10
 echo "Installing Python 3.10..."
