@@ -20,7 +20,6 @@ from omegaconf import OmegaConf
 print(os.getcwd())
 import datetime
 from tqdm import tqdm
-from models.dit import na
 import gc
 
 from data.image.transforms.divisible_crop import DivisibleCrop
