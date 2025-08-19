@@ -311,7 +311,7 @@ if __name__ == "__main__":
     parser.add_argument("--video_path", type=str, default="./test_videos")
     parser.add_argument("--output_dir", type=str, default="./results")
     parser.add_argument("--seed", type=int, default=666)
-    parser.add_argument("--res_h", type=.int, default=720)
+    parser.add_argument("--res_h", type=int, default=720)
     parser.add_argument("--res_w", type=int, default=1280)
     parser.add_argument("--sp_size", type=int, default=1)
     parser.add_argument("--out_fps", type=float, default=None)

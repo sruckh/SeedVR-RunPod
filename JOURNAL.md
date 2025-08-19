@@ -1,3 +1,12 @@
+## 2025-08-18 04:04
+
+### Fix SyntaxError in Inference Scripts |TASK:TASK-2025-08-18-001|
+- **What**: Fixed a `SyntaxError: invalid syntax` in the `inference_seedvr2_3b_modified.py` script.
+- **Why**: The script would fail to run due to a typo in an argument type definition.
+- **How**: Corrected `type=.int` to `type=int` for the `--res_h` argument in the script.
+- **Issues**: None.
+- **Result**: The inference script for the 3B model can now be executed without syntax errors.
+
 # Engineering Journal
 
 ## 2025-08-17 05:52

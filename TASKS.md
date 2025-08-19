@@ -4,31 +4,30 @@
 **Phase**: Runtime Optimization & Dependencies
 **Started**: 2025-01-13
 **Target**: 2025-01-13
-**Progress**: 6/6 tasks completed
+**Progress**: 7/7 tasks completed
 
 ## Current Task
-**Task ID**: TASK-2025-08-16-002
-**Title**: Flash-Attention PyPI Installation Fix - Correcting Non-Existent Wheel Error
+**Task ID**: TASK-2025-08-18-001
+**Title**: Fix SyntaxError in Inference Scripts
 **Status**: COMPLETE
-**Started**: 2025-08-16 11:00
-**Dependencies**: TASK-2025-08-16-001
+**Started**: 2025-08-18 04:04
+**Dependencies**: TASK-2025-08-16-002
 
 ### Task Context
 <!-- Critical information needed to resume this task -->
-- **Problem**: Previous fix used non-existent ByteDance wheel URL, causing continued build failures
-- **Root Cause**: Created fictional wheel URL instead of using real PyPI installation approach
+- **Problem**: A `SyntaxError: invalid syntax` was raised during inference.
+- **Root Cause**: The `type` argument in `parser.add_argument` was set to `.int` instead of `int`.
 - **Key Files**: 
-  - `/opt/docker/SeedVR-RunPod/Dockerfile`: Line 16-18 flash-attention installation corrected
-- **Environment**: GitHub Actions build environment for RunPod container deployment
-- **Strategy**: Use standard PyPI installation instead of pre-built wheels
+  - `/opt/docker/SeedVR-RunPod/inference_seedvr2_3b_modified.py`: Line 314, `type=.int` corrected to `type=int`.
+- **Environment**: RunPod container environment.
+- **Strategy**: Correct the typo in the affected inference script.
 
 ### Findings & Decisions
-- **FINDING-001**: ByteDance wheel URL was fictional and non-existent, explaining continued build failures
-- **DECISION-001**: Use standard PyPI installation `pip install flash-attn` → Platform-agnostic, handles compatibility automatically
-- **FINDING-002**: PyPI version selection matches PyTorch 2.7.1 + CUDA 12.6 environment automatically
-- **DECISION-002**: Remove hardcoded wheel URLs entirely → Eliminates platform compatibility issues
-- **FINDING-003**: PyTorch base image provides proper build environment for flash-attention compilation
-- **DECISION-003**: Trust PyPI dependency resolution over custom wheel selection → Standard, maintainable approach
+- **FINDING-001**: The syntax error was present in `inference_seedvr2_3b_modified.py`.
+- **DECISION-001**: Corrected the typo from `.int` to `int`.
+- **FINDING-002**: The file `inference_seedvr2_7b_modified.py` did not contain the same error.
+- **DECISION-002**: No changes were needed for the `7b` script.
+
 ### Task Chain
 1. ✅ Restore CUDA toolkit installation to run.sh runtime setup (TASK-2025-01-13-003a)
 2. ✅ Enhanced Apex compilation with CUDA detection and fallback (TASK-2025-01-13-003b)
@@ -51,8 +50,9 @@
 19. ✅ PyTorch Base Image Strategic Shift - L40 GPU compatibility solution (TASK-2025-08-15-007)
 20. ✅ Flash-Attention Platform Compatibility Fix - GitHub Actions build resolution (TASK-2025-08-16-001)
 21. ✅ Flash-Attention PyPI Installation Fix - Correcting Non-Existent Wheel Error (TASK-2025-08-16-002)
-22. ⏳ Test container build with PyPI flash-attention installation (TASK-2025-08-16-003)
-23. ⏳ Deploy and validate GitHub Actions build in RunPod environment (TASK-2025-08-16-004)
+22. ✅ Fix SyntaxError in Inference Scripts (TASK-2025-08-18-001)
+23. ⏳ Test container build with PyPI flash-attention installation (TASK-2025-08-16-003)
+24. ⏳ Deploy and validate GitHub Actions build in RunPod environment (TASK-2025-08-16-004)
 
 ## Upcoming Phases
 <!-- Future work not yet started -->
