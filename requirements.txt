@@ -5,7 +5,7 @@ opencv-python==4.9.0.80
 diffusers==0.29.1
 rotary-embedding-torch==0.5.3
 transformers==4.38.2
-mediapy==1.2.0
+mediapy==1.2.4
 # Torch
 torch==2.3.0
 torchvision==0.18.0
