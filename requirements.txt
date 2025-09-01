@@ -1,5 +1,5 @@
 # Common
-einops==0.7.0
+einops==0.8.1
 omegaconf==2.3.0
 opencv-python==4.9.0.80
 diffusers==0.29.1
